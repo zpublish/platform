@@ -1,0 +1,17 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 1,
+  "commands": [
+    {
+      "name": "@macintoshhelper/microblog: Microblog App Design System",
+      "identifier": "main",
+      "script": "./index.js"
+    }
+  ],
+  "menu": {
+    "title": "sketch",
+    "items": [
+      "main"
+    ]
+  }
+}

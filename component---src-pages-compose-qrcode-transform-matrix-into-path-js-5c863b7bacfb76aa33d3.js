@@ -1,0 +1,2 @@
+(self.webpackChunkweb=self.webpackChunkweb||[]).push([[242],{4159:function(n,e,t){"use strict";t.r(e),e.default=function(n,e){var t=e/n.length,u="";return null==n||n.forEach((function(e,c){var f=!1;e.forEach((function(e,l){e?(f||(u+="M"+t*l+" "+(t/2+t*c)+" ",f=!0),f&&l===n.length-1&&(u+="L"+t*(l+1)+" "+(t/2+t*c)+" ")):f&&(u+="L"+t*l+" "+(t/2+t*c)+" ",f=!1)}))})),{cellSize:t,path:u}}}}]);
+//# sourceMappingURL=component---src-pages-compose-qrcode-transform-matrix-into-path-js-5c863b7bacfb76aa33d3.js.map

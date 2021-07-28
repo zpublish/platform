@@ -7,12 +7,12 @@ const SectionTitle = (props: any) => (
   <Headline.H5 name="SectionTitle" mb={3} bold {...props} />
 );
 
-const Section = ({ p, pt, pb, children, ...props }: any) => (
+const Section = ({ p = [16, 40, 0], pt = 40, pb = 40, children, ...props }: any) => (
   <Box
     as="section"
-    p={p || [16, 40, 0]}
-    pt={pt || 40}
-    pb={pb || 40}
+    p={p}
+    pt={pt}
+    pb={pb}
     {...props}
   >
     <Box

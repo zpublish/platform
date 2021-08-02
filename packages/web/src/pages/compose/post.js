@@ -229,8 +229,8 @@ const IndexPage = () => {
                   <Circle borderColor="#CFCFCF" borderWidth={1} size={40} />
                 </Row> */}
                 <Row justifyContent="flex-end">
-                  <Box onClick={() => post ? setStage('zecpages') : null}>
-                    <Button fontFamily="IBM Plex Serif" fontWeight={600} py="8px" px={24} style={{ cursor: 'pointer' }} borderColor={!post ? 'gray' : 'black'} color={!post ? 'gray' : 'black'}>
+                  <Box onClick={() => (post && !error) ? setStage('zecpages') : null}>
+                    <Button fontFamily="IBM Plex Serif" fontWeight={600} py="8px" px={24} style={{ cursor: 'pointer' }} borderColor={(!post || error) ? 'gray' : 'black'} color={(!post || error) ? 'gray' : 'black'}>
                       Post
                     </Button>
                   </Box>

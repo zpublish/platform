@@ -6,225 +6,13 @@ import { Svg, G, Path, Rect, Circle } from 'react-primitives-svg';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 import OAuth from 'oauth-1.0a';
 import crypto from 'crypto';
-import fetch from 'sync-fetch/index';
+// import fetch from 'sync-fetch/index';
 
 import AppBar from '../../../../components/lib/common/AppBar';
 import Footer from '../../../../components/lib/common/Footer';
 import Section from '../../../../components/lib/common/Section';
 
 import data from '../../../../components/data/home_timeline.json';
-
-
-/*
-{
-    "created_at": "Thu Jul 29 19:24:23 +0000 2021",
-    "id": 1420827562566209542,
-    "id_str": "1420827562566209542",
-    "text": "NPR will be even more politically activist now? https:\/\/t.co\/Sb7O4VerJP",
-    "truncated": false,
-    "entities": {
-      "hashtags": [],
-      "symbols": [],
-      "user_mentions": [],
-      "urls": [
-        {
-          "url": "https:\/\/t.co\/Sb7O4VerJP",
-          "expanded_url": "https:\/\/twitter.com\/kellymcb\/status\/1420764637197340675",
-          "display_url": "twitter.com\/kellymcb\/statu…",
-          "indices": [
-            48,
-            71
-          ]
-        }
-      ]
-    },
-    "source": "<a href=\"http:\/\/twitter.com\/download\/iphone\" rel=\"nofollow\">Twitter for iPhone<\/a>",
-    "in_reply_to_status_id": null,
-    "in_reply_to_status_id_str": null,
-    "in_reply_to_user_id": null,
-    "in_reply_to_user_id_str": null,
-    "in_reply_to_screen_name": null,
-    "user": {
-      "id": 1621201316,
-      "id_str": "1621201316",
-      "name": "Vladislav Davidzon",
-      "screen_name": "VladDavidzon",
-      "location": "Between NYC\/Odessa\/Paris.",
-      "description": "Fellow @AtlanticCouncil Columnist @tabletmag Eastern Europe @aminterest @ForeignPolicy Founding editor @theodessareview Author of  “From Odessa with Love”",
-      "url": "https:\/\/t.co\/IBpNj4aYJQ",
-      "entities": {
-        "url": {
-          "urls": [
-            {
-              "url": "https:\/\/t.co\/IBpNj4aYJQ",
-              "expanded_url": "http:\/\/odessareview.com",
-              "display_url": "odessareview.com",
-              "indices": [
-                0,
-                23
-              ]
-            }
-          ]
-        },
-        "description": {
-          "urls": []
-        }
-      },
-      "protected": false,
-      "followers_count": 4583,
-      "friends_count": 3972,
-      "listed_count": 117,
-      "created_at": "Thu Jul 25 20:14:47 +0000 2013",
-      "favourites_count": 17429,
-      "utc_offset": null,
-      "time_zone": null,
-      "geo_enabled": true,
-      "verified": false,
-      "statuses_count": 1246,
-      "lang": null,
-      "contributors_enabled": false,
-      "is_translator": false,
-      "is_translation_enabled": false,
-      "profile_background_color": "C0DEED",
-      "profile_background_image_url": "http:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png",
-      "profile_background_image_url_https": "https:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png",
-      "profile_background_tile": false,
-      "profile_image_url": "http:\/\/pbs.twimg.com\/profile_images\/1056139072526315520\/pw-hgOvS_normal.jpg",
-      "profile_image_url_https": "https:\/\/pbs.twimg.com\/profile_images\/1056139072526315520\/pw-hgOvS_normal.jpg",
-      "profile_banner_url": "https:\/\/pbs.twimg.com\/profile_banners\/1621201316\/1471958761",
-      "profile_link_color": "1DA1F2",
-      "profile_sidebar_border_color": "C0DEED",
-      "profile_sidebar_fill_color": "DDEEF6",
-      "profile_text_color": "333333",
-      "profile_use_background_image": true,
-      "has_extended_profile": false,
-      "default_profile": true,
-      "default_profile_image": false,
-      "following": true,
-      "follow_request_sent": false,
-      "notifications": false,
-      "translator_type": "none",
-      "withheld_in_countries": []
-    },
-    "geo": null,
-    "coordinates": null,
-    "place": null,
-    "contributors": null,
-    "is_quote_status": true,
-    "quoted_status_id": 1420764637197340675,
-    "quoted_status_id_str": "1420764637197340675",
-    "quoted_status": {
-      "created_at": "Thu Jul 29 15:14:20 +0000 2021",
-      "id": 1420764637197340675,
-      "id_str": "1420764637197340675",
-      "text": "NPR ethics policy update: Journalists can now participate in activities that advocate for “freedom and dignity of h… https:\/\/t.co\/uYIPszId0J",
-      "truncated": true,
-      "entities": {
-        "hashtags": [],
-        "symbols": [],
-        "user_mentions": [],
-        "urls": [
-          {
-            "url": "https:\/\/t.co\/uYIPszId0J",
-            "expanded_url": "https:\/\/twitter.com\/i\/web\/status\/1420764637197340675",
-            "display_url": "twitter.com\/i\/web\/status\/1…",
-            "indices": [
-              117,
-              140
-            ]
-          }
-        ]
-      },
-      "source": "<a href=\"https:\/\/about.twitter.com\/products\/tweetdeck\" rel=\"nofollow\">TweetDeck<\/a>",
-      "in_reply_to_status_id": null,
-      "in_reply_to_status_id_str": null,
-      "in_reply_to_user_id": null,
-      "in_reply_to_user_id_str": null,
-      "in_reply_to_screen_name": null,
-      "user": {
-        "id": 8708112,
-        "id_str": "8708112",
-        "name": "kellymcb",
-        "screen_name": "kellymcb",
-        "location": "St. Petersburg, FL",
-        "description": "\"The 1st Amendment is the best amendment.\" NPR Public Editor, SVP @Poynter, chair of the Craig Newmark Center for Ethics and Leadership",
-        "url": "https:\/\/t.co\/ZVJldQCsSX",
-        "entities": {
-          "url": {
-            "urls": [
-              {
-                "url": "https:\/\/t.co\/ZVJldQCsSX",
-                "expanded_url": "http:\/\/www.poynter.org",
-                "display_url": "poynter.org",
-                "indices": [
-                  0,
-                  23
-                ]
-              }
-            ]
-          },
-          "description": {
-            "urls": []
-          }
-        },
-        "protected": false,
-        "followers_count": 10327,
-        "friends_count": 1193,
-        "listed_count": 494,
-        "created_at": "Thu Sep 06 21:13:16 +0000 2007",
-        "favourites_count": 2400,
-        "utc_offset": null,
-        "time_zone": null,
-        "geo_enabled": true,
-        "verified": true,
-        "statuses_count": 8034,
-        "lang": null,
-        "contributors_enabled": false,
-        "is_translator": false,
-        "is_translation_enabled": false,
-        "profile_background_color": "1A1B1F",
-        "profile_background_image_url": "http:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png",
-        "profile_background_image_url_https": "https:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png",
-        "profile_background_tile": false,
-        "profile_image_url": "http:\/\/pbs.twimg.com\/profile_images\/963427294776909825\/PgoZLjF-_normal.jpg",
-        "profile_image_url_https": "https:\/\/pbs.twimg.com\/profile_images\/963427294776909825\/PgoZLjF-_normal.jpg",
-        "profile_banner_url": "https:\/\/pbs.twimg.com\/profile_banners\/8708112\/1398887990",
-        "profile_link_color": "4A913C",
-        "profile_sidebar_border_color": "181A1E",
-        "profile_sidebar_fill_color": "F8ABF4",
-        "profile_text_color": "796767",
-        "profile_use_background_image": true,
-        "has_extended_profile": true,
-        "default_profile": false,
-        "default_profile_image": false,
-        "following": false,
-        "follow_request_sent": false,
-        "notifications": false,
-        "translator_type": "none",
-        "withheld_in_countries": []
-      },
-      "geo": null,
-      "coordinates": null,
-      "place": null,
-      "contributors": null,
-      "is_quote_status": false,
-      "retweet_count": 191,
-      "favorite_count": 563,
-      "favorited": false,
-      "retweeted": false,
-      "possibly_sensitive": false,
-      "possibly_sensitive_appealable": false,
-      "lang": "en"
-    },
-    "retweet_count": 0,
-    "favorite_count": 0,
-    "favorited": false,
-    "retweeted": false,
-    "possibly_sensitive": false,
-    "possibly_sensitive_appealable": false,
-    "lang": "en"
-  }
-*/
 
 const getTimeAgo = (createdAt) => {
   let timeAgoText;
@@ -340,8 +128,8 @@ const TimelineFeed = () => {
 
     const oauth = OAuth({
       consumer: {
-        key: 'KF4tW6swXPg3NnNTbwgnAqrhD',
-        secret: '7VijuvSeCaKPTfStq4UahneuyQ3xO7AItqo0AwqlLriHl08DAs'
+        key: 'n',
+        secret: 'n'
       },
       signature_method: 'HMAC-SHA256',
       hash_function(base_string, key) {
@@ -356,7 +144,7 @@ const TimelineFeed = () => {
         method: 'GET'
     };
     const data = fetch(url, {
-      headers: {...oauth.toHeader(oauth.authorize(request_data, { key: '95449141-g1pufAPk0uRMWsNQmDsyvQolWJBZdx3El1ZVYca2C', secret: 'P7JDxGL9LeSYwFibk6uL6TrEd10SknfCG6wHKhP35x0ev' }))}
+      headers: {...oauth.toHeader(oauth.authorize(request_data, { key: 'n', secret: 'n' }))}
     }).json();
     // const data = await res.json();
 

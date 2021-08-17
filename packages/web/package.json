@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "author": "Macintosh Helper <github@macintoshhelper.com>",
   "dependencies": {
+    "date-fns": "^2.23.0",
     "elemental-react": "^0.3.5-beta.2",
     "gatsby": "^3.10.2",
     "gatsby-image": "^2.2.39",
@@ -15,6 +16,7 @@
     "gatsby-plugin-styled-components": "^4.10.0",
     "gatsby-source-filesystem": "^3.1.0",
     "gatsby-transformer-sharp": "^3.1.0",
+    "@zpublish/oauth-1.0a": "^2.2.6",
     "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "qrcode": "^1.4.4",
@@ -22,11 +24,13 @@
     "react-art": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^5.2.1",
+    "react-modal": "^3.14.3",
     "react-native-web": "^0.15.1",
     "react-primitives": "^0.8.0",
     "simple-masonry-layout": "^1.4.0",
     "styled-components": "^5.0.1",
-    "styled-system": "^5.1.5"
+    "styled-system": "^5.1.5",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "gh-pages": "^2.2.0",
@@ -39,7 +43,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
-    "deploy": "gatsby build && gh-pages -d public",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",

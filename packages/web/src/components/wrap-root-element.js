@@ -3,6 +3,20 @@ import { ThemeProvider, LayoutProvider } from 'elemental-react';
 
 import useWindowViewport from '../hooks/use-window-viewport';
 
+let WebFont;
+
+try {
+  WebFont = require('webfontloader');
+} catch (err) {}
+
+if (typeof window !== 'undefined' && WebFont) {
+  WebFont.load({
+    google: {
+      families: ['IBM Plex Sans', 'IBM Plex Serif', 'IBM Plex Mono']
+    },
+});
+}
+
 const fontSizes = [96, 60, 48, 34, 24, 20, 16, 14];
 const [h1, h2, h3, h4, h5, h6] = fontSizes;
 

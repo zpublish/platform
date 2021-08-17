@@ -1,6 +1,6 @@
 const routes = [
   {
-    name: 'Home',
+    name: 'HomeTimeline',
     path: '/',
     exact: true,
   }

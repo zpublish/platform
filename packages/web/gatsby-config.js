@@ -1,9 +1,10 @@
 module.exports = {
   siteMetadata: {
-    title: `Microblog`,
+    title: `ZPublish - Microblog`,
     description: `Self-hosted microblog.`,
-    author: `@macintoshhelper`,
+    author: `@1337bytes`,
   },
+  pathPrefix: `/microblog`,
   plugins: [
     `gatsby-plugin-react-helmet`,
     {

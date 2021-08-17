@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Page } from 'react-sketchapp';
 import { Box, Text, LayoutProvider } from 'elemental-react';
 import { SketchRouter, Switch, Route, Link, withRouter } from 'react-sketchapp-router';
 
 import * as Routes from './routes';
 import staticRoutes from './routes/routes';
-// import NavOverlay from '../../components/lib/overlays/NavOverlay';
+import NavOverlay from '../../components/lib/overlays/NavOverlay';
 
 const routes = staticRoutes.map((route) => ({
   ...route,
@@ -21,13 +21,13 @@ const screens = [{
   name: 'Desktop', width: 1280, height: 1024,
 }];
 
-const Home = () => (
-  <Box bg="white">
-    <Text color="black">Hello World</Text>
-  </Box>
-);
+// const Home = () => (
+//   <Box bg="white">
+//     <Text color="black">Hello World</Text>
+//   </Box>
+// );
 
-const components = [
+const components: { name: string, path: string, component: any, exact?: boolean }[] = [
   {
     name: 'NavOverlay',
     path: '/navigation',
@@ -48,8 +48,7 @@ const App = () => {
 
   return (
     <Page name="App" style={{ flex: 1, display: 'flex', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', width: screensTotalWidth }}>
-      <Home />
-      {/* <SketchRouter locations={['/profile/a']} viewport={screens}>
+      <SketchRouter locations={['/profile/a']} viewport={screens}>
         <Switch>
           {components.concat(routes).map(({ name: routeName, component: Component, path, exact }) => (
             <Route path={path} render={({ match: { params }, viewport, breakpoint }) => {
@@ -62,7 +61,7 @@ const App = () => {
             }} exact={exact} />
           ))}
         </Switch>
-      </SketchRouter> */}
+      </SketchRouter>
     </Page>
   );
 };

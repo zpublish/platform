@@ -52,8 +52,9 @@ const AutoTextArea = ({ ...props }) => {
 		setParentHeight(`${textAreaRef.current.scrollHeight}px`);
 		setText(event.target.value);
 
-		if (props.onChange) {
-      props.onChange(event);
+		if (props.onChangeText) {
+      // console.debug('debug: ', { onChangeText: props.onChangeText, value: event.target.value });
+      props.onChangeText(event.target.value);
 		}
   }
 
@@ -203,7 +204,7 @@ const IndexPage = () => {
             <>
               <Section pt={52} px={[32, 80, 0]} pb="0px">
                 {/* <TextInput as="textarea"  /> */}
-                <AutoTextArea onChange={(event) => setPost(event.target.value)}/>
+                <AutoTextArea onChangeText={(text) => setPost(text)}/>
                 <Line bg="#E4E4E4" width="100%" mt={40} />
                 {error && (
                   <Text color="red" fontSize={12} fontFamily="IBM Plex Sans" my="8px">{error}</Text>
@@ -229,7 +230,7 @@ const IndexPage = () => {
                   <Circle borderColor="#CFCFCF" borderWidth={1} size={40} />
                 </Row> */}
                 <Row justifyContent="flex-end">
-                  <Box onClick={() => post ? setStage('zecpages') : null}>
+                  <Box onClick={() => (post && !error) ? setStage('zecpages') : null}>
                     <Button fontFamily="IBM Plex Serif" fontWeight={600} py="8px" px={24} style={{ cursor: 'pointer' }} borderColor={!post ? 'gray' : 'black'} color={!post ? 'gray' : 'black'}>
                       Post
                     </Button>

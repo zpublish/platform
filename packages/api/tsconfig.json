@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "ES2020",
+    "esModuleInterop": true,
+    "target": "es2019",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "lib",
+    "resolveJsonModule": true
+  },
+  "lib": ["es2015"],
+  "include": [
+    "src/**/*"
+  ]
+}

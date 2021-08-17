@@ -23,9 +23,7 @@ const CloseIcon = () => (
   </Svg>
 );
 
-const NavOverlay = ({ onMenuClick }: { onMenuClick?: () => void }) => {
-  console.log({ onMenuClick });
-
+const NavOverlay = ({ title, onMenuClick }: { title?: string, onMenuClick?: () => void }) => {
   return (
     <Box flex={1}>
       <AppBar>
@@ -33,11 +31,11 @@ const NavOverlay = ({ onMenuClick }: { onMenuClick?: () => void }) => {
         <Box onClick={onMenuClick}>
           <CloseIcon />
         </Box>
-        <AppBar.Title />
+        {title ? <AppBar.Title>{title}</AppBar.Title> : <AppBar.Title />}
         <AppBar.Fill />
       </AppBar>
       <Box flex={1} justifyContent="center" alignItems="center">
-        {['Home', 'Instagram', 'About', 'Contact'].map((name) => (
+        {['Home', 'Microblog', 'Videos', 'Photos', 'Articles', 'About'].map((name) => (
           <Box p={20}>
             <Text color="black" fontSize={32} fontFamily="Roboto" bold>
               {name?.toUpperCase()}

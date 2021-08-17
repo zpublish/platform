@@ -3,9 +3,9 @@
   "bundleVersion": 1,
   "commands": [
     {
-      "name": "@macintoshhelper/microblog: Microblog App Design System",
+      "name": "@zpublish/platform: Open-source Social Media Design System",
       "identifier": "main",
-      "script": "./index.js"
+      "script": "./.ts-compiled/index.js"
     }
   ],
   "menu": {

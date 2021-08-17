@@ -6,7 +6,7 @@
   "scripts": {
     "build:types": "tsc -d -p tsconfig.json",
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc --watch -p tsconfig.json",
+    "dev": "tsc --watch -p tsconfig.json & tsc --watch -d -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

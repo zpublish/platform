@@ -19,7 +19,7 @@ const Title = extend(Text as any, () => ({
 
 // @ts-ignore
 Title.defaultProps = {
-  children: 'Microblog App',
+  children: 'ZPublish – 1337bytes',
 };
 
 const Flex = () => (

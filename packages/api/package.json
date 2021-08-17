@@ -1,0 +1,47 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "exports": "./lib/server.js",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf lib/",
+    "start": "node -r dotenv/config --es-module-specifier-resolution=node lib/server.js dotenv_config_path=config.env",
+    "build:types": "tsc -d -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "dev": "NODE_ENV=development nodemon --watch src -e ts,ejs --exec npm run dev:start",
+    "dev:start": "npm-run-all clean build start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express-graphql": "^0.9.0",
+    "@types/node": "^16.4.13",
+    "nodemon": "^2.0.12",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@graphql-tools/schema": "^8.0.3",
+    "@hapi/joi": "^17.1.1",
+    "@zpublish/oauth-1.0a": "^2.2.6-beta.1",
+    "date-fns": "^2.23.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.5.1",
+    "graphql-relay-tools": "^0.1.1",
+    "graphql-tools": "^8.1.0",
+    "loglevel": "^1.7.1",
+    "lowdb": "^2.1.0",
+    "node-fetch": "^2.6.1",
+    "oauth2-server": "^3.1.1",
+    "redis-server": "^1.2.2"
+  },
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  }
+}

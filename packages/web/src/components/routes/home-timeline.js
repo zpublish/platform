@@ -20,6 +20,10 @@ import QRCode from '../qrcode';
 import useWindowViewport from '../../hooks/use-window-viewport';
 
 const getTimeAgo = (createdAt) => {
+  if (!createdAt) {
+    return '';
+  }
+
   let timeAgoText;
   if (differenceInDays(new Date(), createdAt) <= 0) {
     if (differenceInHours(new Date(), createdAt) === 0) {
@@ -37,7 +41,12 @@ const getTimeAgo = (createdAt) => {
 }
 
 const ProfileIcon = ({ size = 40, uri }) => (
-  <Image width={size} height={size} borderRadius="50%" src={uri} />
+  <>
+    {uri
+      ? <Image width={size} height={size} borderRadius="50%" src={uri} />
+      : <Box borderRadius="50%" width={size} height={size} bg="#DEDEDE" />
+    }
+  </>
 );
 
 const NameText = extend(Text, () => ({
@@ -164,7 +173,7 @@ const toBase64 = (text) => {
   }
 };
 
-const MicroPostFeedItem = ({ id, user, retweetUser, createdAt, retweetedStatus, quotedStatus, text, inReplyToStatusId }) => {
+const MicroPostFeedItem = ({ id, user, retweetUser, createdAt, isRepliedTo, retweetedStatus, quotedStatus, text, inReplyToStatusId }) => {
   const [tipVisible, setTipVisible] = useState(false);
   const { width } = useWindowViewport();
   const [memoContent, setMemoContent] = useState('test');
@@ -269,20 +278,30 @@ const MicroPostFeedItem = ({ id, user, retweetUser, createdAt, retweetedStatus, 
         <Box mr={12} alignItems="center">
           {inReplyToStatusId && <Box width="2px" height={32} bg="#B5B5B5" mb={2} />}
           <ProfileIcon size={40} uri={user.profile_image_url_https} />
+          {isRepliedTo && <Box width="2px" flex={1} bg="#B5B5B5" mb={2} />}
         </Box>
         <Box flex={1}>
           <Row justifyContent="space-between" flex={1}>
             <Box>
-              <NameText>{user.name}</NameText>
+              <NameText mb={1}>{user.name}</NameText>
               <UsernameText>{`@${user.screen_name}`}</UsernameText>
             </Box>
             {/* <Box flex={1} /> */}
             <Text fontFamily="Helvetica" fontSize={16}>{getTimeAgo(createdAt)}</Text>
           </Row>
           <Box pt="4px">
-            <Text fontSize={16} fontFamily="Helvetica">
-              {text}
-            </Text>
+            {text ? (
+              <Text fontSize={16} fontFamily="Helvetica">
+                {text}
+              </Text>
+              ) : (
+                <>
+                  <Box bg="#DEDEDE" height={16} width="90%" mb="4px" />
+                  <Box bg="#DEDEDE" height={16} width="80%" mb="4px" />
+                  <Box bg="#DEDEDE" height={16} width="90%" mb="4px" />
+                </>
+              )
+            }
           </Box>
           {quotedStatus && (
             <QuotePost user={quotedStatus.user} createdAt={new Date(quotedStatus.created_at)} text={quotedStatus.text} />
@@ -387,18 +406,32 @@ const TimelineFeed = () => {
 
   return (
     <Box>
-      {items.slice(0, 10).map(({ id_str: id, quoted_status, retweeted_status, in_reply_to_status_id, user, text, ...args }) => {
+      {items.slice(0, 10).map(({
+        quoted_status, retweeted_status,
+        in_reply_to_status_id,
+        in_reply_to_screen_name,
+        entities, in_reply_to_user_id_str, user, text,
+        ...args
+      }) => {
         let timeAgoText;
         const createdAt = new Date(args.created_at);
 
+        let inReplyToUser;
+        if (in_reply_to_screen_name) {
+          if (entities?.user_mentions) {
+            entities.user_mentions.forEach(({ screen_name, name, id_str }) => {
+              if (id_str === in_reply_to_user_id_str) {
+                inReplyToUser = { name, screen_name };
+              }
+            })
+          }
+        }
         // const secondsDiff = ((new Date()).getTime() - createdAt.getTime()) / 1000;
 
         return (
-          <>
+          <Box borderTopWidth={1} borderBottomWidth={1} borderColor="#EAEAEA">
             {retweeted_status ? (
               <MicroPostFeedItem
-                key={`${id}`}
-                id={id}
                 user={retweeted_status.user}
                 createdAt={new Date(retweeted_status.created_at)}
                 quotedStatus={retweeted_status.quoted_status}
@@ -408,9 +441,17 @@ const TimelineFeed = () => {
                 inReplyToStatusId={in_reply_to_status_id}
               />
             ) : (
-              <MicroPostFeedItem key={`${id}`} id={id} user={user} createdAt={createdAt} quotedStatus={quoted_status} text={conversations[id]?.text || text} inReplyToStatusId={in_reply_to_status_id} />
+              <>
+                {in_reply_to_status_id && (
+                  <>
+                    <MicroPostFeedItem user={inReplyToUser} isRepliedTo />
+                    <Text fontSize={16} color="blue" fontFamily="Helvetica" ml={68} my={1}>Show this thread</Text>
+                  </>
+                )}
+                <MicroPostFeedItem user={user} createdAt={createdAt} quotedStatus={quoted_status} text={text} inReplyToStatusId={in_reply_to_status_id} />
+              </>
             )}
-          </>
+          </Box>
         );
       })}
     </Box>

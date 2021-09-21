@@ -26,14 +26,16 @@ module.exports = function (config) {
     alias: {
       ...config.resolve.alias,
       react: path.resolve(__dirname, './node_modules/react/'),
+      'react-test-renderer': path.resolve(__dirname, './node_modules/react-test-renderer/'),
       'react-native': path.resolve(__dirname, './mock.js'),
-      // 'react-sketchapp': path.resolve(__dirname, './node_modules/react-sketchapp/'),
+      'react-sketchapp': path.resolve(__dirname, './node_modules/react-sketchapp/'),
       'react-primitives': path.resolve(__dirname, './node_modules/react-primitives/'),
       'react-primitives-svg': path.resolve(__dirname, './node_modules/react-primitives-svg/'),
       'simple-masonry-layout': path.resolve(__dirname, './node_modules/simple-masonry-layout/'),
       // 'elemental-react': path.resolve(__dirname, './node_modules/elemental-react'),
-      // 'react-sketchapp-router': path.resolve(__dirname, './node_modules/react-sketchapp-router'),
+      'react-sketchapp-router': path.resolve(__dirname, './node_modules/react-sketchapp-router'),
       'styled-components': path.resolve('./node_modules/styled-components'),
+      'qrcode': path.resolve('./node_modules/qrcode'),
     },
   };
 }

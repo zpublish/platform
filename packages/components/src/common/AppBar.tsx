@@ -19,7 +19,7 @@ const Title = extend(Text as any, () => ({
 
 // @ts-ignore
 Title.defaultProps = {
-  children: 'ZPublish – 1337bytes',
+  children: 'ZPublish',
 };
 
 const Flex = () => (

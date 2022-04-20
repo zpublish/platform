@@ -1,5 +1,5 @@
 {
-  "name": "components",
+  "name": "@zpublish/components",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,12 +13,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@react-platform/svg": "0.0.1",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
     "@types/react-primitives": "^0.6.2",
     "@types/styled-components": "^5.1.9",
     "@types/styled-system": "^5.1.10",
-    "elemental-react": "^0.3.5-beta.2",
+    "elemental-react": "^0.4.0-beta.3",
     "typescript": "^4.2.3"
   },
   "dependencies": {

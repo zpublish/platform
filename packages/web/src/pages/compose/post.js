@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 // import { Link } from 'gatsby';
 
-import { Button, Box, Text, TextInput, Line, useWindowDimensions } from 'elemental-react';
-import QRCode from '../../components/qrcode';
+import { Button, Box, Text, TextInput, Row, Line, useWindowDimensions } from 'elemental-react';
+import { QRCode, Icon } from '@elemental-zcash/components';
+import { CopyBoxIcon } from '@elemental-zcash/icons';
 
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
 import AppBar from '../../../../components/lib/common/AppBar';
 import Section from '../../../../components/lib/common/Section';
-import { Circle, Row } from 'elemental-react/lib/main.web.esm';
 import useWindowViewport from '../../hooks/use-window-viewport';
 
 const Link = ({ children, to }) => <a href={to}>{children}</a>;
@@ -272,8 +272,8 @@ const IndexPage = () => {
                       ml={16}
                       width={32}
                       height={32}
-                      borderWidth={1}
-                      borderColor="black"
+                      // borderWidth={1}
+                      // borderColor="black"
                       alignItems="center"
                       justifyContent="center"
                       onClick={async () => {
@@ -285,7 +285,8 @@ const IndexPage = () => {
                       onMouseLeave={() => { setCopyIsHovered(false); }}
                       style={{ ...(copyIsHovered && { opacity: 0.5 }), ...(copyIsClicked && { opacity: 0.1 })}}
                     >
-                      <CopyIcon />
+                      {/* <CopyIcon /> */}
+                      <Icon icon={CopyBoxIcon} color="black" />
                     </Box>
                   </Row>
                 </Box>

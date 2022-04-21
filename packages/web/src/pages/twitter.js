@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'gatsby';
 import { Box, Row, Text } from 'elemental-react';
 
+import Gallery from '../../../components/src/common/Gallery';
 
 import Layout from '../components/layout';
 import SEO from '../components/seo';
 import useWindowViewport from '../hooks/use-window-viewport';
-import AppBar from '@zpublish/components/lib/common/AppBar';
-import NavOverlay from '@zpublish/components/lib/overlays/NavOverlay';
-import Section from '@zpublish/components/lib/common/Section';
-import Footer from '@zpublish/components/lib/common/Footer';
+import AppBar from '../../../components/lib/common/AppBar';
+import NavOverlay from '../../../components/lib/overlays/NavOverlay';
+import Section from '../../../components/lib/common/Section';
+import Footer from '../../../components/lib/common/Footer';
 
-import ZecPagesTimeline from '../components/routes/zecpages-timeline';
+import TwitterTimeline from '../components/routes/microblog-timeline';
 
 // const hmacSha256Base64Digest = async (body, k) => {
 //   let secret = k; // the secret key
@@ -44,7 +45,7 @@ const Home = () => {
             <AppBar.Title />
             <AppBar.Fill />
           </AppBar>
-          <ZecPagesTimeline />
+          <TwitterTimeline />
           {/* <Section pt="8px">
           </Section> */}
           <Footer />

@@ -5,8 +5,14 @@
   "version": "0.1.0",
   "author": "Macintosh Helper <github@macintoshhelper.com>",
   "dependencies": {
+    "@elemental-zcash/components": "0.0.2-beta.1",
+    "@elemental-zcash/icons": "0.0.1-beta.1",
+    "@react-platform/core": "0.0.2-beta.6",
+    "@react-platform/native": "0.0.3-beta.5",
+    "@react-platform/svg": "0.0.1",
+    "@zpublish/components": "0.0.1",
     "date-fns": "^2.23.0",
-    "elemental-react": "^0.3.5-beta.2",
+    "elemental-react": "^0.4.0-beta.3",
     "gatsby": "^3.10.2",
     "gatsby-image": "^2.2.39",
     "gatsby-plugin-manifest": "^3.1.0",
@@ -16,7 +22,6 @@
     "gatsby-plugin-styled-components": "^4.10.0",
     "gatsby-source-filesystem": "^3.1.0",
     "gatsby-transformer-sharp": "^3.1.0",
-    "@zpublish/oauth-1.0a": "^2.2.6",
     "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "qrcode": "^1.4.4",
@@ -52,9 +57,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/macintoshhelper/microblog"
+    "url": "https://github.com/zpublish/platform"
   },
   "bugs": {
-    "url": "https://github.com/macintoshhelper/microblog/issues"
+    "url": "https://github.com/zpublish/platform/issues"
   }
 }

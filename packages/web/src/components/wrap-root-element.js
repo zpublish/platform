@@ -1,5 +1,7 @@
 import React from 'react';
 import { ThemeProvider, LayoutProvider } from 'elemental-react';
+import { theme } from '@elemental-zcash/components';
+import { RPNativeProvider } from '@react-platform/native';
 
 import useWindowViewport from '../hooks/use-window-viewport';
 
@@ -60,22 +62,21 @@ const Wrapper = ({ children }) => {
   );
 }
 
+const processStyleFunc = (style) => ({ ...style });
+
 export default ({ element }) => {
   return (
-    <ThemeProvider
-      theme={{
-        breakpoints: ['768px', '1024px'],
-        fontSizes,
-        lineHeights,
-        fontFamily: {
-          primary: 'Helvetica',
-          secondary: 'Helvetica',
-        },
-      }}
-    >
-      <Wrapper>
-        {element}
-      </Wrapper>
-    </ThemeProvider>
+    <RPNativeProvider processStyle={processStyleFunc}>
+      <ThemeProvider
+        design={{ Button: {} }}
+        // @ts-ignore
+        colorMode="day"
+        theme={theme}
+      >
+        <Wrapper>
+          {element}
+        </Wrapper>
+      </ThemeProvider>
+    </RPNativeProvider>
   );
 };

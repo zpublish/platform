@@ -4,11 +4,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Box, Text, TextInput, Row, Line, useWindowDimensions } from 'elemental-react';
 import { QRCode, Icon } from '@elemental-zcash/components';
 import { CopyBoxIcon } from '@elemental-zcash/icons';
+import AppBar from '@zpublish/components/lib/common/AppBar';
+import Section from '@zpublish/components/lib/common/Section';
 
 import Layout from '../../components/layout';
 import SEO from '../../components/seo';
-import AppBar from '../../../../components/lib/common/AppBar';
-import Section from '../../../../components/lib/common/Section';
 import useWindowViewport from '../../hooks/use-window-viewport';
 
 const Link = ({ children, to }) => <a href={to}>{children}</a>;

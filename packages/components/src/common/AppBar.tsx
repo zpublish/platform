@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 import { Box, Text, Row, Line, extend } from 'elemental-react';
 
-const MenuIcon = ({ ...props }) => (
+const MenuIcon = ({ color = 'black', ...props }) => (
   <Box width={48} height={48} px="4px" py="6px" justifyContent="space-between" {...props}>
-    {(new Array(3).fill(null)).map((_, i) => (<Line key={i} bg="black" height="4px" width="40px" />))}
+    {(new Array(3).fill(null)).map((_, i) => (<Line key={i} bg={color} height="4px" width="40px" />))}
   </Box>
 );
 
@@ -27,16 +27,19 @@ const Flex = () => (
 );
 
 const AppBar = ({
-  children = (
-    <>
-      <MenuIcon />
-        <Title />
-      <Flex />
+  title = 'Title',
+  color,
+  children,
+  ...props
+}: { title?: string, color?: string, children?: ReactNode }) => (
+  <Row p={16} alignItems="center" justifyContent="space-between" {...props}>
+    {children || (
+      <>
+        <MenuIcon color={color} />{/* @ts-ignore */}
+        <Title color={color}>{title}</Title>
+        <Flex />
     </>
-  ),
-}: { children?: ReactNode }) => (
-  <Row p={16} alignItems="center" justifyContent="space-between">
-    {children}
+    )}
     {/* <Box pr="4px">
       <ProfileIcon />
     </Box> */}

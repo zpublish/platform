@@ -1,11 +1,16 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Link } from 'gatsby';
+import FlatList from '@react-platform/native/lib/modules/FlatList';
 import { Box, extend, Image, Row, Text, ThemeProvider, useTheme } from 'elemental-react';
 import { Svg, G, Path, Rect, Circle } from 'react-primitives-svg';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 // import OAuth from 'oauth-1.0a';
 import Modal from 'react-modal';
+import { useInfiniteQuery } from 'react-query';
+import { InfiniteLoader, List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller } from 'react-virtualized';
+import Measure from 'react-measure'
+
 // import crypto from 'crypto';
 // import fetch from 'sync-fetch/index';
 
@@ -17,6 +22,12 @@ import Section from '@zpublish/components/lib/common/Section';
 // import data from '../../../../components/data/home_timeline.json';
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 import userTimelineData from '@zpublish/components/data/user_timeline.json';
+
+
+const cache = new CellMeasurerCache({
+  defaultHeight: 50,
+  fixedWidth: true
+});
 
 
 const copyTextToClipboard = async (text) => {
@@ -235,23 +246,131 @@ const aggregateDataById = (dataList) => {
 const TimelineFeed = () => {
   const { theme } = useTheme();
   const [items, setItems] = useState(userTimelineData);
-  const [zecPagesItems, setZecPagesItems] = useState([,,,,,,]);
+  const [zecPagesItems, setZecPagesItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  // const [list, setList] = useState();
 
   const [conversations, setConversations] = useState({
     
   });
 
-  useEffect(async () => {
-    const url = 'https://be.zecpages.com/board/1';
+  // useEffect(async () => {
+  //   if (isLoading) {
+  //     return;
+  //   }
 
-    const res = await fetch(url, {
-      headers: {},
-    });
+  //   const url = `https://be.zecpages.com/board/${currentPage}`;
+  //   setIsLoading(true);
 
-    const _data = await res.json();
+  //   const res = await fetch(url, {
+  //     headers: {},
+  //   });
 
-    setZecPagesItems(_data);
-  }, [setZecPagesItems]);
+  //   const _data = await res.json();
+
+  //   setIsLoading(false);
+  //   setZecPagesItems([...zecPagesItems, ..._data]);
+  // }, [setZecPagesItems, currentPage]);
+
+  const {
+    status,
+    data,
+    error,
+    isFetching,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+  } = useInfiniteQuery(
+    'zecpages_board',
+    async ({ pageParam = 1 }) => {
+      const url = `https://be.zecpages.com/board/${pageParam}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      return {
+        results: data,
+        nextId: pageParam + 1,
+      };
+    },
+    {
+      // getPreviousPageParam: firstPage => firstPage.previousId ?? undefined,
+      getNextPageParam: lastPage => {
+        return lastPage.nextId ?? undefined;
+      },
+    }
+  );
+  
+  const results = data?.pages.map(page => page.results).flat() || [];
+
+  const rowCount = hasNextPage ? results.length + 1 : results.length;
+  const loadMoreRows = isFetchingNextPage ? () => {} : fetchNextPage;
+  const isRowLoaded = ({ index }) => !hasNextPage || index < results.length;
+
+  const rowRenderer = ({ index, key, style, parent }) => {
+    let isLoaded = false;
+    let content;
+    let item;
+
+    if (!isRowLoaded({ index })) {
+      item = {};
+    } else {
+      isLoaded = true;
+      item = results[index];
+    }
+
+    const { datetime, memo, id } = item || {};
+
+    return (
+      <CellMeasurer
+        cache={cache}
+        columnIndex={0}
+        key={key}
+        parent={parent}
+        rowIndex={index}
+      >
+        {({ measure, registerChild }) => (
+          // 'style' attribute required to position cell (within parent List)
+          <div ref={registerChild} style={style}>
+            <Measure
+              bounds
+              onResize={contentRect => {
+                measure({ height: contentRect.bounds.height, width: contentRect.bounds.width })
+                // this.setState({ dimensions: contentRect.bounds })
+              }}
+            >
+              {({ measureRef }) => (
+                <div ref={measureRef}>
+                  {isLoaded && datetime ? (
+                    <ZecPostFeedItem
+                      // style={style}
+                      // key={key}
+                      createdAt={new Date(Number(datetime))}
+                      text={memo}
+                      mb={16}
+                      bg="#E9F7F9"
+                    />
+                  ) : (
+                    <Box>
+                      <Text>Loading...</Text>
+                    </Box>
+                  )}
+                </div>
+              )}
+            </Measure>
+            {/* <img
+              onLoad={measure}
+              src={source}
+            /> */}
+          </div>
+        )}
+      </CellMeasurer>
+    )
+  };
+
 
   // useEffect(async () => {
   //   const url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
@@ -280,7 +399,7 @@ const TimelineFeed = () => {
   // }, []);
 
   return (
-    <Box>
+    <Box flex={1}>
       <Box px={[32, 40]} py={20} center>
         <Text fontSize={20} fontFamily="secondary" center bold>
           {'ZEC-powered anonymous memo board '}
@@ -297,14 +416,87 @@ const TimelineFeed = () => {
       <Box px={[16, 40]} mb={16}>
         <Box>
           <ThemeProvider theme={{ ...theme, colors: { ...theme.colors, icons: { ...theme.colors.icons, qrcode_box: '#fff' } }}}>
-            <CryptoAddressCopy /*bg="#313880"*/ bg="#224259" color="white" address="zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f" />
+            <CryptoAddressCopy /*bg="#313880"*/
+              bg="#224259"
+              color="white"
+              address="zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f"
+            />
           </ThemeProvider>
         </Box>
       </Box>
-      <Section py={16}>
-        {zecPagesItems.map(({ datetime, memo, id }, i) => (
+      <Section py={16} flex={1}>
+        <Box flex={1}>
+          <InfiniteLoader
+            isRowLoaded={isRowLoaded}
+            loadMoreRows={loadMoreRows}
+            rowCount={rowCount}>
+            {({ onRowsRendered, registerChild }) => (
+              <WindowScroller
+                // ref={this._setRef}
+                scrollElement={window}
+                // scrollElement={isScrollingCustomElement ? customElement : window}
+              >
+                {({ height, isScrolling, onChildScroll, scrollTop, registerChild }) => (
+                  <AutoSizer disableHeight>
+                    {({ width }) => {
+                      return (
+                        <div ref={registerChild}>
+                          <List
+                            ref={registerChild}
+                            onRowsRendered={onRowsRendered}
+                            rowRenderer={rowRenderer}
+                            deferredMeasurementCache={cache}
+                            rowHeight={cache.rowHeight}
+                            rowCount={rowCount}
+                            height={height}
+                            autoHeight
+                            width={width}
+                            scrollTop={scrollTop}
+                            // {...otherProps}
+                          />
+                        </div>
+                      );
+                    }}
+                  </AutoSizer>
+                )}
+              </WindowScroller>
+            )}
+          </InfiniteLoader>
+        </Box>
+        {/* <Box flex={1}>
+          <FlatList
+            data={results}
+            style={{ height: '100%' }}
+            keyExtractor={(item) => item.id}
+            // getItemLayout={...} - optimisation
+            renderItem={({ item }) => {
+              const { datetime, memo, id } = item;
+
+              return (
+                <ZecPostFeedItem
+                  // key={`id-${id}`}
+                  createdAt={new Date(Number(datetime))}
+                  text={memo}
+                  mb={16}
+                  bg="#E9F7F9"
+                />
+              );
+            }}
+            onEndReachedThreshold={0.2}
+            onEndReached={() => {
+              if (!isLoading) {
+                console.log({ loadNextPage: currentPage + 1 });
+                // debugger;
+                // setCurrentPage(currentPage + 1);
+
+                // this.fetchUser(this.page); // method for API call 
+              }
+            }}
+          />
+        </Box> */}
+        {/* {zecPagesItems.map(({ datetime, memo, id }, i) => (
           <ZecPostFeedItem key={id || `index-${i}`} createdAt={new Date(Number(datetime))} text={memo} mb={16} bg="#E9F7F9" />
-        ))}  
+        ))}   */}
       </Section>
       <a href="https://zecpages.com">
         <Text center fontSize={20} lineHeight={24} color="blue">

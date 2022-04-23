@@ -19,6 +19,7 @@ const Section = ({ p = [16, 40, 0], pt = 40, pb = 40, children, ...props }: any)
       width="100%"
       maxWidth={1024}
       alignSelf="center"
+      flex={1}
     >
       {children}
     </Box>

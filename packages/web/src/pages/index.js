@@ -37,7 +37,7 @@ const Home = () => {
     <Layout>
       <SEO title="Home | Microblog App" />
       {/* <Box width="100vw"> */}
-      <Box bg="white" minHeight={viewport.height} width="100%">
+      <Box bg="white" height={viewport.height} width="100%">
         <Box bg="white">
           <AppBar>
             <AppBar.MenuIcon onClick={() => { setNavOverlayOpen(!navOverlayOpen); }} />

@@ -1,7 +1,12 @@
 const routes = [
   {
-    name: 'HomeTimeline',
-    path: '/',
+    name: 'ZecPagesTimeline',
+    path: '/zecpages',
+    exact: true,
+  },
+  {
+    name: 'TwitterTimeline',
+    path: '/twitter',
     exact: true,
   },
   {

@@ -106,3 +106,6 @@ dist
 # Env variables
 *.env
 .DS_Store
+
+public/
+public2/

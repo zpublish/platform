@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'gatsby';
 import FlatList from '@react-platform/native/lib/modules/FlatList';
-import { Box, extend, Image, Row, Text, ThemeProvider, useTheme } from 'elemental-react';
+import { Box, extend, Image, Row, Text, ThemeProvider, useTheme, useWindowDimensions } from 'elemental-react';
 import { Svg, G, Path, Rect, Circle } from 'react-primitives-svg';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 // import OAuth from 'oauth-1.0a';
@@ -14,7 +14,7 @@ import Measure from 'react-measure'
 // import crypto from 'crypto';
 // import fetch from 'sync-fetch/index';
 
-import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy } from '@elemental-zcash/components';
+import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button } from '@elemental-zcash/components';
 import { MicroPostFeedItem, ZecPostFeedItem } from '@zpublish/components';
 import Section from '@zpublish/components/lib/common/Section';
 
@@ -249,11 +249,18 @@ const TimelineFeed = () => {
   const [zecPagesItems, setZecPagesItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalState, setModalState] = useState(null);
+  const { width } = useWindowDimensions();
+  const zecpagesAddress = 'zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f';
+  const zecpagesPostAmount = 0.001;
+  const [memo, setMemo] = useState('');
   // const [list, setList] = useState();
 
   const [conversations, setConversations] = useState({
     
   });
+
+  const zecPagesAddressUri = `zcash:${zecpagesAddress}?amount=${zecpagesPostAmount}&memo=${memo}`;
 
   // useEffect(async () => {
   //   if (isLoading) {
@@ -301,14 +308,20 @@ const TimelineFeed = () => {
       getNextPageParam: lastPage => {
         return lastPage.nextId ?? undefined;
       },
+      refetchOnWindowFocus: false,
     }
   );
   
   const results = data?.pages.map(page => page.results).flat() || [];
 
   const rowCount = hasNextPage ? results.length + 1 : results.length;
-  const loadMoreRows = isFetchingNextPage ? () => {} : fetchNextPage;
-  const isRowLoaded = ({ index }) => !hasNextPage || index < results.length;
+  const loadMoreRows = isFetchingNextPage
+    ? () => {}
+    : ({ startIndex, stopIndex }) => {
+      // debugger;
+      fetchNextPage();
+    };
+  const isRowLoaded = ({ index }) => !hasNextPage || !!results[index] || index < results.length;
 
   const rowRenderer = ({ index, key, style, parent }) => {
     let isLoaded = false;
@@ -371,6 +384,10 @@ const TimelineFeed = () => {
     )
   };
 
+  const closeModal = () => {
+    setModalState(null);
+  }
+
 
   // useEffect(async () => {
   //   const url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
@@ -400,6 +417,102 @@ const TimelineFeed = () => {
 
   return (
     <Box flex={1}>
+      <Modal
+        isOpen={!!modalState}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={{
+          content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+            padding: 0,
+          },
+        }}
+        contentLabel="Modal"
+      >
+        {{
+          zecpages_qrcode: (
+            <Box p={40}>
+              <Row>
+                <Box flex={1} />
+                <ThemeProvider
+                  theme={{
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      btn: {
+                        ...theme.colors.btn,
+                        bg: 'rgba(0, 0, 0, 1)',
+                        hoverBg: 'rgb(40, 40, 40)',
+                        focusBg: 'rgb(60, 60, 60)',
+                        text: '#fff'
+                        // disabledBg: '#E4E2E2',
+                        // disabledText: '#7D7D7D',
+                        // text: '#000000',
+                        // textBtn: {
+                        //   text: '#000',
+                        //   hoveredBg: '#FFF7E5',
+                        //   focusedBg: '#FFF1D1',
+                        //   pressedBg: '#FFF1D1',
+                        //   disabledText: '#7D7D7D',
+                        // }
+                    }
+                  }
+                }}>
+                  <Button fontFamily="IBM Plex Sans" color="white" fontSize={14} fontWeight="bold" onClick={closeModal} mb={32}>
+                    CLOSE
+                  </Button>
+                </ThemeProvider>
+              </Row>
+              <Box alignItems="center">
+                <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Send 0.001 ZEC to</Text>
+                <QRCode
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  includeMargin={true}
+                  style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
+                  // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
+                  value={zecPagesAddressUri}
+                />
+              </Box>
+              {/* <Row
+                bg="#F1F1F1"
+                borderRadius={4}
+                p="8px"
+                px={12}
+                mt={32}
+                alignItems="center"
+              >
+                <Text as="codespan" flex={1} style={{ wordBreak: 'break-all' }} fontFamily="IBM Plex Mono" fontSize={12} lineHeight={16}>{`zcash:${zaddr}?amount=0.001&memo=${memo}`}</Text>
+                <Box
+                  style={{ cursor: 'pointer' }}
+                  ml={16}
+                  width={32}
+                  height={32}
+                  borderWidth={1}
+                  borderColor="black"
+                  alignItems="center"
+                  justifyContent="center"
+                  onClick={async () => {
+                    await copyTextToClipboard(`zcash:${zaddr}?amount=0.001&memo=${memo}`);
+                    setCopyIsClicked(true);
+                    setTimeout(() => { setCopyIsClicked(false); setCopyIsHovered(false); }, 200);
+                  }}
+                  onMouseEnter={() => setCopyIsHovered(true)}
+                  onMouseLeave={() => { setCopyIsHovered(false); }}
+                  style={{ ...(copyIsHovered && { opacity: 0.5 }), ...(copyIsClicked && { opacity: 0.1 })}}
+                >
+                  <CopyIcon />
+                </Box>
+              </Row> */}
+            </Box>
+          ),
+        }[modalState]}
+      </Modal>
       <Box px={[32, 40]} py={20} center>
         <Text fontSize={20} fontFamily="secondary" center bold>
           {'ZEC-powered anonymous memo board '}
@@ -409,8 +522,32 @@ const TimelineFeed = () => {
         </Text>
       </Box>
       <Box px={[16, 40]} mb={16}>
-        <InputField label="Write your post here..." labelVisible={false}>
-          {({ label, value }) => <TextInput p={16} borderColor="#313880" placeholderColor="#636363" borderWidth={2} label={label} value={value} multiline />}
+        <InputField
+          label="Write your post here..."
+          // onTextChange={(value) => {
+          //   setMemo(value);
+          // }}
+          value={memo}
+          labelVisible={false}
+        >
+          {({ label, value }) =>
+            <TextInput
+              p={16}
+              borderColor="#313880"
+              placeholderColor="#636363"
+              borderWidth={2}
+              label={label}
+              value={value}
+              onChange={(event) => {
+                // setTextAreaHeight("auto");
+                // setParentHeight(`${textAreaRef.current.scrollHeight}px`);
+                // setText(event.target.value);
+            
+                setMemo(event.target.value);
+              }}
+              multiline
+            />
+          }
         </InputField>
       </Box>
       <Box px={[16, 40]} mb={16}>
@@ -419,7 +556,14 @@ const TimelineFeed = () => {
             <CryptoAddressCopy /*bg="#313880"*/
               bg="#224259"
               color="white"
-              address="zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f"
+              address={zecpagesAddress}
+              onCopyPress={async () => {
+                await copyTextToClipboard(zecPagesAddressUri);
+              }}
+              onQrcodePress={() => {
+                setModalState('zecpages_qrcode');
+                // console.log('qrcode');
+              }}
             />
           </ThemeProvider>
         </Box>
@@ -429,7 +573,8 @@ const TimelineFeed = () => {
           <InfiniteLoader
             isRowLoaded={isRowLoaded}
             loadMoreRows={loadMoreRows}
-            rowCount={rowCount}>
+            rowCount={rowCount}
+          >
             {({ onRowsRendered, registerChild }) => (
               <WindowScroller
                 // ref={this._setRef}

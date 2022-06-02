@@ -37,9 +37,14 @@ exports.onCreateWebpackConfig = ({
         '@react-platform/native': path.resolve(__dirname, './node_modules/@react-platform/native/'),
         '@react-platform/svg': path.resolve(__dirname, './node_modules/@react-platform/svg/'),
         '@elemental-zcash/components': path.resolve(__dirname, './node_modules/@elemental-zcash/components/'),
+        // '@elemental-zcash/components': path.resolve(__dirname, '../../../../elemental-zcash/react/packages/core'),
+        'elemental-color': path.resolve(__dirname, './node_modules/elemental-color'),
         '@elemental-zcash/icons': path.resolve(__dirname, './node_modules/@elemental-zcash/icons/'),
         // '@zpublish/components': path.resolve(__dirname, '../components'),
-        '@zpublish/components': path.resolve(__dirname, './node_modules/@zpublish/components/'),
+        ...(process.env.NODE_ENV === 'development'
+          ? { '@zpublish/components': path.resolve(__dirname, '../components') }
+          : { '@zpublish/components': path.resolve(__dirname, './node_modules/@zpublish/components/') }
+        ),
   
       },
       extensions: getConfig().resolve.extensions.concat('.web.js'),

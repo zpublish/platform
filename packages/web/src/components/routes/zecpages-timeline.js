@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Link } from 'gatsby';
-import FlatList from '@react-platform/native/lib/modules/FlatList';
+// import FlatList from '@react-platform/native/lib/modules/FlatList';
 import { Box, extend, Image, Row, Text, ThemeProvider, useTheme, useWindowDimensions } from 'elemental-react';
 import { Svg, G, Path, Rect, Circle } from 'react-primitives-svg';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
@@ -14,14 +14,16 @@ import Measure from 'react-measure'
 // import crypto from 'crypto';
 // import fetch from 'sync-fetch/index';
 
-import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button } from '@elemental-zcash/components';
+import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button, AutoTextArea } from '@elemental-zcash/components';
 import { MicroPostFeedItem, ZecPostFeedItem } from '@zpublish/components';
 import Section from '@zpublish/components/lib/common/Section';
+import FlatList from '@zpublish/components/lib/common/FlatList';
 
 
 // import data from '../../../../components/data/home_timeline.json';
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 import userTimelineData from '@zpublish/components/data/user_timeline.json';
+import { ZecPagesProvider, useZecPages } from '../context/ZecPagesContext';
 
 
 const cache = new CellMeasurerCache({
@@ -254,6 +256,7 @@ const TimelineFeed = () => {
   const zecpagesAddress = 'zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f';
   const zecpagesPostAmount = 0.001;
   const [memo, setMemo] = useState('');
+  const { state: zecPagesState, addReply } = useZecPages();
   // const [list, setList] = useState();
 
   const [conversations, setConversations] = useState({
@@ -294,7 +297,8 @@ const TimelineFeed = () => {
   } = useInfiniteQuery(
     'zecpages_board',
     async ({ pageParam = 1 }) => {
-      const url = `https://be.zecpages.com/board/${pageParam}`;
+      const isDev = false;
+      const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -306,83 +310,90 @@ const TimelineFeed = () => {
     {
       // getPreviousPageParam: firstPage => firstPage.previousId ?? undefined,
       getNextPageParam: lastPage => {
-        return lastPage.nextId ?? undefined;
+        return (lastPage.nextId || lastPage.length > 0) ?? undefined;
       },
       refetchOnWindowFocus: false,
     }
   );
   
-  const results = data?.pages.map(page => page.results).flat() || [];
+  const results = (data?.pages.map(page => page.results).flat() || []);
+
+  useEffect(() => {
+    results.forEach((result) => {
+      if (!zecPagesState[result.reply_to_post] && result.reply_to_post) {
+        addReply(result);
+      }
+    });
+  }, [results])
 
   const rowCount = hasNextPage ? results.length + 1 : results.length;
   const loadMoreRows = isFetchingNextPage
     ? () => {}
-    : ({ startIndex, stopIndex }) => {
-      // debugger;
-      fetchNextPage();
-    };
+    : async ({ startIndex, stopIndex }) => fetchNextPage();
+
   const isRowLoaded = ({ index }) => !hasNextPage || !!results[index] || index < results.length;
 
-  const rowRenderer = ({ index, key, style, parent }) => {
-    let isLoaded = false;
-    let content;
-    let item;
+  // const rowRenderer = ({ index, key, style, parent }) => {
+  //   let isLoaded = false;
+  //   let content;
+  //   let item;
 
-    if (!isRowLoaded({ index })) {
-      item = {};
-    } else {
-      isLoaded = true;
-      item = results[index];
-    }
+  //   if (!isRowLoaded({ index })) {
+  //     item = {};
+  //   } else {
+  //     isLoaded = true;
+  //     item = results[index];
+  //   }
 
-    const { datetime, memo, id } = item || {};
+  //   const { datetime, memo, id } = item || {};
 
-    return (
-      <CellMeasurer
-        cache={cache}
-        columnIndex={0}
-        key={key}
-        parent={parent}
-        rowIndex={index}
-      >
-        {({ measure, registerChild }) => (
-          // 'style' attribute required to position cell (within parent List)
-          <div ref={registerChild} style={style}>
-            <Measure
-              bounds
-              onResize={contentRect => {
-                measure({ height: contentRect.bounds.height, width: contentRect.bounds.width })
-                // this.setState({ dimensions: contentRect.bounds })
-              }}
-            >
-              {({ measureRef }) => (
-                <div ref={measureRef}>
-                  {isLoaded && datetime ? (
-                    <ZecPostFeedItem
-                      // style={style}
-                      // key={key}
-                      createdAt={new Date(Number(datetime))}
-                      text={memo}
-                      mb={16}
-                      bg="#E9F7F9"
-                    />
-                  ) : (
-                    <Box>
-                      <Text>Loading...</Text>
-                    </Box>
-                  )}
-                </div>
-              )}
-            </Measure>
-            {/* <img
-              onLoad={measure}
-              src={source}
-            /> */}
-          </div>
-        )}
-      </CellMeasurer>
-    )
-  };
+  //   return (
+  //     <CellMeasurer
+  //       cache={cache}
+  //       columnIndex={0}
+  //       key={key}
+  //       parent={parent}
+  //       rowIndex={index}
+  //     >
+  //       {({ measure, registerChild }) => (
+  //         // 'style' attribute required to position cell (within parent List)
+  //         <div ref={registerChild} style={style}>
+  //           <Measure
+  //             bounds
+  //             onResize={contentRect => {
+  //               measure({ height: contentRect.bounds.height, width: contentRect.bounds.width })
+  //               // this.setState({ dimensions: contentRect.bounds })
+  //             }}
+  //           >
+  //             {({ measureRef }) => (
+  //               <div ref={measureRef}>
+  //                 {isLoaded && datetime ? (
+  //                   <ZecPostFeedItem
+  //                     // style={style}
+  //                     // key={key}
+  //                     createdAt={new Date(Number(datetime))}
+  //                     text={memo}
+  //                     id={id}
+  //                     mb={16}
+  //                     bg="#E9F7F9"
+  //                   />
+  //                 ) : (
+  //                   <Box>
+  //                     <Text>Loading...</Text>
+  //                   </Box>
+  //                 )}
+  //               </div>
+  //             )}
+  //           </Measure>
+  //           {/* <img
+  //             onLoad={measure}
+  //             src={source}
+  //           /> */}
+  //         </div>
+  //       )}
+  //     </CellMeasurer>
+  //   )
+  // };
 
   const closeModal = () => {
     setModalState(null);
@@ -479,36 +490,6 @@ const TimelineFeed = () => {
                   value={zecPagesAddressUri}
                 />
               </Box>
-              {/* <Row
-                bg="#F1F1F1"
-                borderRadius={4}
-                p="8px"
-                px={12}
-                mt={32}
-                alignItems="center"
-              >
-                <Text as="codespan" flex={1} style={{ wordBreak: 'break-all' }} fontFamily="IBM Plex Mono" fontSize={12} lineHeight={16}>{`zcash:${zaddr}?amount=0.001&memo=${memo}`}</Text>
-                <Box
-                  style={{ cursor: 'pointer' }}
-                  ml={16}
-                  width={32}
-                  height={32}
-                  borderWidth={1}
-                  borderColor="black"
-                  alignItems="center"
-                  justifyContent="center"
-                  onClick={async () => {
-                    await copyTextToClipboard(`zcash:${zaddr}?amount=0.001&memo=${memo}`);
-                    setCopyIsClicked(true);
-                    setTimeout(() => { setCopyIsClicked(false); setCopyIsHovered(false); }, 200);
-                  }}
-                  onMouseEnter={() => setCopyIsHovered(true)}
-                  onMouseLeave={() => { setCopyIsHovered(false); }}
-                  style={{ ...(copyIsHovered && { opacity: 0.5 }), ...(copyIsClicked && { opacity: 0.1 })}}
-                >
-                  <CopyIcon />
-                </Box>
-              </Row> */}
             </Box>
           ),
         }[modalState]}
@@ -531,22 +512,27 @@ const TimelineFeed = () => {
           labelVisible={false}
         >
           {({ label, value }) =>
-            <TextInput
-              p={16}
-              borderColor="#313880"
-              placeholderColor="#636363"
-              borderWidth={2}
-              label={label}
-              value={value}
-              onChange={(event) => {
-                // setTextAreaHeight("auto");
-                // setParentHeight(`${textAreaRef.current.scrollHeight}px`);
-                // setText(event.target.value);
+            // <TextInput
+            //   p={16}
+            //   borderColor="#313880"
+            //   placeholderColor="#636363"
+            //   borderWidth={2}
+            //   label={label}
+            //   value={value}
+            //   onChange={(event) => {
+            //     // setTextAreaHeight("auto");
+            //     // setParentHeight(`${textAreaRef.current.scrollHeight}px`);
+            //     // setText(event.target.value);
             
-                setMemo(event.target.value);
-              }}
-              multiline
-            />
+            //     setMemo(event.target.value);
+            //   }}
+            //   multiline
+            // /> 
+            // What’s up?
+            <AutoTextArea placeholder="Write your post here..." value={value} onChangeText={(text) => {
+              setMemo(text);
+              console.log({ text });
+            }}/>
           }
         </InputField>
       </Box>
@@ -570,7 +556,75 @@ const TimelineFeed = () => {
       </Box>
       <Section py={16} flex={1}>
         <Box flex={1}>
-          <InfiniteLoader
+          <FlatList
+            data={results}
+            hasNextPage={hasNextPage}
+            onEndReached={async (res) => {
+              await loadMoreRows(res);
+            }}
+            renderItem={({ item, index }) => {
+              const { datetime, memo, reply_to_post, reply_count: replyCount, id, likes } = item;
+              const isLoaded = isRowLoaded({ index });
+              
+
+              // Line
+              // See all replies
+              // Line
+
+              if (reply_to_post) { return null; }
+
+              return isLoaded && datetime && !reply_to_post ? (
+                <>
+                  <ZecPostFeedItem
+                    createdAt={new Date(Number(datetime))}
+                    replyToPostId={reply_to_post}
+                    text={memo}
+                    replyCount={replyCount}
+                    likeCount={likes}
+                    id={id}
+                    mb={16}
+                    // bg="#E9F7F9"
+                  />
+                  {replyCount > 0 && zecPagesState[id] && Object.keys(zecPagesState[id]).map((k, i) => {
+                    const replyPost = zecPagesState[id][k];
+                    const textContent = replyPost.memo?.replace(/^REPLY::\w+ /, '').trim();
+
+                    return !!textContent && (
+                      <>
+                        {replyCount > 1 && i === 0 && (
+                          <Box>
+                            <Box width="3px" height={32} bg="#E9F7F9" ml={64} mt={-16} />
+                            <Row pb={16} mb="8px" mt="8px">
+                              <a href={`https://zecpages.com/z/post/${id}/`} target="_blank" rel="noopener noreferrer">
+                                <Text fontSize={16} color="blue" fontFamily="Helvetica" ml={68} my={1} underline>See all replies</Text>
+                              </a>
+                            </Row>
+                          </Box>
+                        )}
+                        <ZecPostFeedItem
+                          textContent={textContent}
+                          createdAt={new Date(Number(replyPost.datetime))}
+                          replyToPostId={id}
+                          text={replyPost.memo}
+                          replyCount={replyPost.reply_count}
+                          likeCount={likes}
+                          id={replyPost.id}
+                          mt={0}
+                          mb={16}
+                          // bg="#E9F7F9"
+                        />
+                      </>
+                    )
+                  })}
+                </>
+              ) : (
+                <Box>
+                  <Text>Loading...</Text>
+                </Box>
+              );
+            }}
+          />
+          {/* <InfiniteLoader
             isRowLoaded={isRowLoaded}
             loadMoreRows={loadMoreRows}
             rowCount={rowCount}
@@ -606,7 +660,7 @@ const TimelineFeed = () => {
                 )}
               </WindowScroller>
             )}
-          </InfiniteLoader>
+          </InfiniteLoader> */}
         </Box>
         {/* <Box flex={1}>
           <FlatList

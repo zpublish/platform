@@ -12,6 +12,7 @@ import SEO from '../components/seo';
 import useWindowViewport from '../hooks/use-window-viewport';
 
 import ZecPagesTimeline from '../components/routes/zecpages-timeline';
+import { ZecPagesProvider } from '../components/context/ZecPagesContext';
 
 // const hmacSha256Base64Digest = async (body, k) => {
 //   let secret = k; // the secret key
@@ -44,7 +45,9 @@ const Home = () => {
             <AppBar.Title />
             <AppBar.Fill />
           </AppBar>
-          <ZecPagesTimeline />
+          <ZecPagesProvider>
+            <ZecPagesTimeline />
+          </ZecPagesProvider>
           {/* <Section pt="8px">
           </Section> */}
           <Footer />

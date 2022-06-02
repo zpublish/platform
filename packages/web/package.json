@@ -10,7 +10,7 @@
     "@react-platform/core": "0.0.2-beta.6",
     "@react-platform/native": "0.0.3-beta.5",
     "@react-platform/svg": "0.0.1",
-    "@zpublish/components": "0.0.1-beta.0",
+    "@zpublish/components": "0.0.1-beta.1",
     "date-fns": "^2.23.0",
     "elemental-react": "^0.4.0-beta.3",
     "formik": "^2.2.9",

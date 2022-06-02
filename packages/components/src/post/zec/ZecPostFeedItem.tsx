@@ -88,6 +88,8 @@ const ZecPostFeedItem = ({
                   // repost: `https://twitter.com/intent/retweet?tweet_id=${id}`,
                   // favorite: `https://twitter.com/intent/like?tweet_id=${id}`,
                 };
+                const nav: any = typeof window !== 'undefined' ? window?.navigator : {};
+
                 return (// @ts-ignore
                   <Row
                     alignItems="center"
@@ -95,7 +97,7 @@ const ZecPostFeedItem = ({
                     as="a"
                     {...actionId !== 'share' && hrefById[actionId] && { href: hrefById[actionId], rel: 'noopener noreferrer', target: '_blank' }}
                     onClick={(actionId === 'share')
-                      ? () => { if (typeof navigator !== 'undefined' && navigator?.canShare && navigator.share) { navigator?.share({ url: `https://zecpages.com/z/post/${id}/`}) } }
+                      ? () => { if (typeof nav !== 'undefined' && nav?.canShare && nav.share) { nav?.share({ url: `https://zecpages.com/z/post/${id}/`}) } }
                       : undefined
                     }
                     >

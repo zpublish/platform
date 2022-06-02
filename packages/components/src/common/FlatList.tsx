@@ -75,7 +75,7 @@ const FlatList = ({ onEndReached, data, renderItem, hasNextPage }: {
       {({ onRowsRendered, registerChild }) => (
         <WindowScroller
           // ref={this._setRef}
-          scrollElement={window}
+          scrollElement={typeof window !== 'undefined' ? window : undefined}
           // scrollElement={isScrollingCustomElement ? customElement : window}
         >
           {({ height, isScrolling, onChildScroll, scrollTop, registerChild }) => (

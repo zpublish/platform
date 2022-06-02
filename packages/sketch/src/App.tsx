@@ -1,11 +1,13 @@
 import React, { ReactNode } from 'react';
 import { Page } from 'react-sketchapp';
-import { Box, Text, LayoutProvider } from 'elemental-react';
+import { Box, Text, LayoutProvider, ThemeProvider } from 'elemental-react';
 import { SketchRouter, Switch, Route, Link, withRouter } from 'react-sketchapp-router';
+import { theme } from '@elemental-zcash/components';
 
 import * as Routes from './routes';
 import staticRoutes from './routes/routes';
 import NavOverlay from '../../components/lib/overlays/NavOverlay';
+import { RPNativeProvider } from '@react-platform/native';
 
 const routes = staticRoutes.map((route) => ({
   ...route,
@@ -44,25 +46,38 @@ const screensTotalWidth = screens.reduce((acc, { width }) => {
   return acc;
 }, 0);
 
+const processStyleFunc = (style: any) => ({ ...style });
+
+
 const App = () => {
 
   return (
-    <Page name="App" style={{ flex: 1, display: 'flex', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', width: screensTotalWidth }}>
-      <SketchRouter locations={['/profile/a']} viewport={screens}>
-        <Switch>
-          {components.concat(routes).map(({ name: routeName, component: Component, path, exact }) => (
-            <Route path={path} render={({ match: { params }, viewport, breakpoint }) => {
+    <RPNativeProvider processStyle={processStyleFunc}>
+      <Page name="App" style={{ flex: 1, display: 'flex', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', width: screensTotalWidth }}>
+        <ThemeProvider
+            design={{ Button: {} }}
+            // @ts-ignore
+            colorMode="day"
+            theme={theme}
+          >{/* @ts-ignore */}
+            <SketchRouter locations={['/profile/a']} viewport={screens}>
+              {/* @ts-ignore */}
+              <Switch>
+                {components.concat(routes).map(({ name: routeName, component: Component, path, exact }) => (
+                  <Route path={path} render={({ match: { params }, viewport, breakpoint }) => {
 
-              return (
-                <LayoutProvider breakpoint={breakpoint}>
-                  <Component {...params} />
-                </LayoutProvider>
-              );
-            }} exact={exact} />
-          ))}
-        </Switch>
-      </SketchRouter>
-    </Page>
+                    return (
+                      <LayoutProvider breakpoint={breakpoint}>
+                        <Component {...params} />
+                      </LayoutProvider>
+                    );
+                  }} exact={exact} />
+                ))}
+              </Switch>
+            </SketchRouter>
+          </ThemeProvider>
+      </Page>
+    </RPNativeProvider>
   );
 };
 

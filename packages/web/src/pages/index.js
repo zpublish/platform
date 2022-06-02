@@ -12,6 +12,7 @@ import SEO from '../components/seo';
 import useWindowViewport from '../hooks/use-window-viewport';
 
 import ZecPagesTimeline from '../components/routes/zecpages-timeline';
+import { ZecPagesProvider } from '../components/context/ZecPagesContext';
 
 // const hmacSha256Base64Digest = async (body, k) => {
 //   let secret = k; // the secret key
@@ -37,14 +38,16 @@ const Home = () => {
     <Layout>
       <SEO title="Home | Microblog App" />
       {/* <Box width="100vw"> */}
-      <Box bg="white" minHeight={viewport.height} width="100%">
+      <Box bg="white" height={viewport.height} width="100%">
         <Box bg="white">
           <AppBar>
             <AppBar.MenuIcon onClick={() => { setNavOverlayOpen(!navOverlayOpen); }} />
             <AppBar.Title />
             <AppBar.Fill />
           </AppBar>
-          <ZecPagesTimeline />
+          <ZecPagesProvider>
+            <ZecPagesTimeline />
+          </ZecPagesProvider>
           {/* <Section pt="8px">
           </Section> */}
           <Footer />

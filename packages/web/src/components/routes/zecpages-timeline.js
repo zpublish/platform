@@ -1,22 +1,35 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Link } from 'gatsby';
-import { Box, extend, Image, Row, Text, ThemeProvider, useTheme } from 'elemental-react';
+// import FlatList from '@react-platform/native/lib/modules/FlatList';
+import { Box, extend, Image, Row, Text, ThemeProvider, useTheme, useWindowDimensions } from 'elemental-react';
 import { Svg, G, Path, Rect, Circle } from 'react-primitives-svg';
 import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 // import OAuth from 'oauth-1.0a';
 import Modal from 'react-modal';
+import { useInfiniteQuery } from 'react-query';
+import { InfiniteLoader, List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller } from 'react-virtualized';
+import Measure from 'react-measure'
+
 // import crypto from 'crypto';
 // import fetch from 'sync-fetch/index';
 
-import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy } from '@elemental-zcash/components';
+import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button, AutoTextArea } from '@elemental-zcash/components';
 import { MicroPostFeedItem, ZecPostFeedItem } from '@zpublish/components';
 import Section from '@zpublish/components/lib/common/Section';
+import FlatList from '@zpublish/components/lib/common/FlatList';
 
 
 // import data from '../../../../components/data/home_timeline.json';
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 import userTimelineData from '@zpublish/components/data/user_timeline.json';
+import { ZecPagesProvider, useZecPages } from '../context/ZecPagesContext';
+
+
+const cache = new CellMeasurerCache({
+  defaultHeight: 50,
+  fixedWidth: true
+});
 
 
 const copyTextToClipboard = async (text) => {
@@ -235,23 +248,157 @@ const aggregateDataById = (dataList) => {
 const TimelineFeed = () => {
   const { theme } = useTheme();
   const [items, setItems] = useState(userTimelineData);
-  const [zecPagesItems, setZecPagesItems] = useState([,,,,,,]);
+  const [zecPagesItems, setZecPagesItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modalState, setModalState] = useState(null);
+  const { width } = useWindowDimensions();
+  const zecpagesAddress = 'zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f';
+  const zecpagesPostAmount = 0.001;
+  const [memo, setMemo] = useState('');
+  const { state: zecPagesState, addReply } = useZecPages();
+  // const [list, setList] = useState();
 
   const [conversations, setConversations] = useState({
     
   });
 
-  useEffect(async () => {
-    const url = 'https://be.zecpages.com/board/1';
+  const zecPagesAddressUri = `zcash:${zecpagesAddress}?amount=${zecpagesPostAmount}&memo=${memo}`;
 
-    const res = await fetch(url, {
-      headers: {},
+  // useEffect(async () => {
+  //   if (isLoading) {
+  //     return;
+  //   }
+
+  //   const url = `https://be.zecpages.com/board/${currentPage}`;
+  //   setIsLoading(true);
+
+  //   const res = await fetch(url, {
+  //     headers: {},
+  //   });
+
+  //   const _data = await res.json();
+
+  //   setIsLoading(false);
+  //   setZecPagesItems([...zecPagesItems, ..._data]);
+  // }, [setZecPagesItems, currentPage]);
+
+  const {
+    status,
+    data,
+    error,
+    isFetching,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+  } = useInfiniteQuery(
+    'zecpages_board',
+    async ({ pageParam = 1 }) => {
+      const isDev = false;
+      const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      return {
+        results: data,
+        nextId: pageParam + 1,
+      };
+    },
+    {
+      // getPreviousPageParam: firstPage => firstPage.previousId ?? undefined,
+      getNextPageParam: lastPage => {
+        return (lastPage.nextId || lastPage.length > 0) ?? undefined;
+      },
+      refetchOnWindowFocus: false,
+    }
+  );
+  
+  const results = (data?.pages.map(page => page.results).flat() || []);
+
+  useEffect(() => {
+    results.forEach((result) => {
+      if (!zecPagesState[result.reply_to_post] && result.reply_to_post) {
+        addReply(result);
+      }
     });
+  }, [results])
 
-    const _data = await res.json();
+  const rowCount = hasNextPage ? results.length + 1 : results.length;
+  const loadMoreRows = isFetchingNextPage
+    ? () => {}
+    : async ({ startIndex, stopIndex }) => fetchNextPage();
 
-    setZecPagesItems(_data);
-  }, [setZecPagesItems]);
+  const isRowLoaded = ({ index }) => !hasNextPage || !!results[index] || index < results.length;
+
+  // const rowRenderer = ({ index, key, style, parent }) => {
+  //   let isLoaded = false;
+  //   let content;
+  //   let item;
+
+  //   if (!isRowLoaded({ index })) {
+  //     item = {};
+  //   } else {
+  //     isLoaded = true;
+  //     item = results[index];
+  //   }
+
+  //   const { datetime, memo, id } = item || {};
+
+  //   return (
+  //     <CellMeasurer
+  //       cache={cache}
+  //       columnIndex={0}
+  //       key={key}
+  //       parent={parent}
+  //       rowIndex={index}
+  //     >
+  //       {({ measure, registerChild }) => (
+  //         // 'style' attribute required to position cell (within parent List)
+  //         <div ref={registerChild} style={style}>
+  //           <Measure
+  //             bounds
+  //             onResize={contentRect => {
+  //               measure({ height: contentRect.bounds.height, width: contentRect.bounds.width })
+  //               // this.setState({ dimensions: contentRect.bounds })
+  //             }}
+  //           >
+  //             {({ measureRef }) => (
+  //               <div ref={measureRef}>
+  //                 {isLoaded && datetime ? (
+  //                   <ZecPostFeedItem
+  //                     // style={style}
+  //                     // key={key}
+  //                     createdAt={new Date(Number(datetime))}
+  //                     text={memo}
+  //                     id={id}
+  //                     mb={16}
+  //                     bg="#E9F7F9"
+  //                   />
+  //                 ) : (
+  //                   <Box>
+  //                     <Text>Loading...</Text>
+  //                   </Box>
+  //                 )}
+  //               </div>
+  //             )}
+  //           </Measure>
+  //           {/* <img
+  //             onLoad={measure}
+  //             src={source}
+  //           /> */}
+  //         </div>
+  //       )}
+  //     </CellMeasurer>
+  //   )
+  // };
+
+  const closeModal = () => {
+    setModalState(null);
+  }
+
 
   // useEffect(async () => {
   //   const url = 'https://api.twitter.com/1.1/statuses/home_timeline.json';
@@ -280,7 +427,73 @@ const TimelineFeed = () => {
   // }, []);
 
   return (
-    <Box>
+    <Box flex={1}>
+      <Modal
+        isOpen={!!modalState}
+        // onAfterOpen={afterOpenModal}
+        onRequestClose={closeModal}
+        style={{
+          content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+            padding: 0,
+          },
+        }}
+        contentLabel="Modal"
+      >
+        {{
+          zecpages_qrcode: (
+            <Box p={40}>
+              <Row>
+                <Box flex={1} />
+                <ThemeProvider
+                  theme={{
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      btn: {
+                        ...theme.colors.btn,
+                        bg: 'rgba(0, 0, 0, 1)',
+                        hoverBg: 'rgb(40, 40, 40)',
+                        focusBg: 'rgb(60, 60, 60)',
+                        text: '#fff'
+                        // disabledBg: '#E4E2E2',
+                        // disabledText: '#7D7D7D',
+                        // text: '#000000',
+                        // textBtn: {
+                        //   text: '#000',
+                        //   hoveredBg: '#FFF7E5',
+                        //   focusedBg: '#FFF1D1',
+                        //   pressedBg: '#FFF1D1',
+                        //   disabledText: '#7D7D7D',
+                        // }
+                    }
+                  }
+                }}>
+                  <Button fontFamily="IBM Plex Sans" color="white" fontSize={14} fontWeight="bold" onClick={closeModal} mb={32}>
+                    CLOSE
+                  </Button>
+                </ThemeProvider>
+              </Row>
+              <Box alignItems="center">
+                <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Send 0.001 ZEC to</Text>
+                <QRCode
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  includeMargin={true}
+                  style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
+                  // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
+                  value={zecPagesAddressUri}
+                />
+              </Box>
+            </Box>
+          ),
+        }[modalState]}
+      </Modal>
       <Box px={[32, 40]} py={20} center>
         <Text fontSize={20} fontFamily="secondary" center bold>
           {'ZEC-powered anonymous memo board '}
@@ -290,21 +503,199 @@ const TimelineFeed = () => {
         </Text>
       </Box>
       <Box px={[16, 40]} mb={16}>
-        <InputField label="Write your post here..." labelVisible={false}>
-          {({ label, value }) => <TextInput p={16} borderColor="#313880" placeholderColor="#636363" borderWidth={2} label={label} value={value} multiline />}
+        <InputField
+          label="Write your post here..."
+          // onTextChange={(value) => {
+          //   setMemo(value);
+          // }}
+          value={memo}
+          labelVisible={false}
+        >
+          {({ label, value }) =>
+            // <TextInput
+            //   p={16}
+            //   borderColor="#313880"
+            //   placeholderColor="#636363"
+            //   borderWidth={2}
+            //   label={label}
+            //   value={value}
+            //   onChange={(event) => {
+            //     // setTextAreaHeight("auto");
+            //     // setParentHeight(`${textAreaRef.current.scrollHeight}px`);
+            //     // setText(event.target.value);
+            
+            //     setMemo(event.target.value);
+            //   }}
+            //   multiline
+            // /> 
+            // What’s up?
+            <AutoTextArea placeholder="Write your post here..." value={value} onChangeText={(text) => {
+              setMemo(text);
+              console.log({ text });
+            }}/>
+          }
         </InputField>
       </Box>
       <Box px={[16, 40]} mb={16}>
         <Box>
           <ThemeProvider theme={{ ...theme, colors: { ...theme.colors, icons: { ...theme.colors.icons, qrcode_box: '#fff' } }}}>
-            <CryptoAddressCopy /*bg="#313880"*/ bg="#224259" color="white" address="zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f" />
+            <CryptoAddressCopy /*bg="#313880"*/
+              bg="#224259"
+              color="white"
+              address={zecpagesAddress}
+              onCopyPress={async () => {
+                await copyTextToClipboard(zecPagesAddressUri);
+              }}
+              onQrcodePress={() => {
+                setModalState('zecpages_qrcode');
+                // console.log('qrcode');
+              }}
+            />
           </ThemeProvider>
         </Box>
       </Box>
-      <Section py={16}>
-        {zecPagesItems.map(({ datetime, memo, id }, i) => (
+      <Section py={16} flex={1}>
+        <Box flex={1}>
+          <FlatList
+            data={results}
+            hasNextPage={hasNextPage}
+            onEndReached={async (res) => {
+              await loadMoreRows(res);
+            }}
+            renderItem={({ item, index }) => {
+              const { datetime, memo, reply_to_post, reply_count: replyCount, id, likes } = item;
+              const isLoaded = isRowLoaded({ index });
+              
+
+              // Line
+              // See all replies
+              // Line
+
+              if (reply_to_post) { return null; }
+
+              return isLoaded && datetime && !reply_to_post ? (
+                <>
+                  <ZecPostFeedItem
+                    createdAt={new Date(Number(datetime))}
+                    replyToPostId={reply_to_post}
+                    text={memo}
+                    replyCount={replyCount}
+                    likeCount={likes}
+                    id={id}
+                    mb={16}
+                    // bg="#E9F7F9"
+                  />
+                  {replyCount > 0 && zecPagesState[id] && Object.keys(zecPagesState[id]).map((k, i) => {
+                    const replyPost = zecPagesState[id][k];
+                    const textContent = replyPost.memo?.replace(/^REPLY::\w+ /, '').trim();
+
+                    return !!textContent && (
+                      <>
+                        {replyCount > 1 && i === 0 && (
+                          <Box>
+                            <Box width="3px" height={32} bg="#E9F7F9" ml={64} mt={-16} />
+                            <Row pb={16} mb="8px" mt="8px">
+                              <a href={`https://zecpages.com/z/post/${id}/`} target="_blank" rel="noopener noreferrer">
+                                <Text fontSize={16} color="blue" fontFamily="Helvetica" ml={68} my={1} underline>See all replies</Text>
+                              </a>
+                            </Row>
+                          </Box>
+                        )}
+                        <ZecPostFeedItem
+                          textContent={textContent}
+                          createdAt={new Date(Number(replyPost.datetime))}
+                          replyToPostId={id}
+                          text={replyPost.memo}
+                          replyCount={replyPost.reply_count}
+                          likeCount={likes}
+                          id={replyPost.id}
+                          mt={0}
+                          mb={16}
+                          // bg="#E9F7F9"
+                        />
+                      </>
+                    )
+                  })}
+                </>
+              ) : (
+                <Box>
+                  <Text>Loading...</Text>
+                </Box>
+              );
+            }}
+          />
+          {/* <InfiniteLoader
+            isRowLoaded={isRowLoaded}
+            loadMoreRows={loadMoreRows}
+            rowCount={rowCount}
+          >
+            {({ onRowsRendered, registerChild }) => (
+              <WindowScroller
+                // ref={this._setRef}
+                scrollElement={window}
+                // scrollElement={isScrollingCustomElement ? customElement : window}
+              >
+                {({ height, isScrolling, onChildScroll, scrollTop, registerChild }) => (
+                  <AutoSizer disableHeight>
+                    {({ width }) => {
+                      return (
+                        <div ref={registerChild}>
+                          <List
+                            ref={registerChild}
+                            onRowsRendered={onRowsRendered}
+                            rowRenderer={rowRenderer}
+                            deferredMeasurementCache={cache}
+                            rowHeight={cache.rowHeight}
+                            rowCount={rowCount}
+                            height={height}
+                            autoHeight
+                            width={width}
+                            scrollTop={scrollTop}
+                            // {...otherProps}
+                          />
+                        </div>
+                      );
+                    }}
+                  </AutoSizer>
+                )}
+              </WindowScroller>
+            )}
+          </InfiniteLoader> */}
+        </Box>
+        {/* <Box flex={1}>
+          <FlatList
+            data={results}
+            style={{ height: '100%' }}
+            keyExtractor={(item) => item.id}
+            // getItemLayout={...} - optimisation
+            renderItem={({ item }) => {
+              const { datetime, memo, id } = item;
+
+              return (
+                <ZecPostFeedItem
+                  // key={`id-${id}`}
+                  createdAt={new Date(Number(datetime))}
+                  text={memo}
+                  mb={16}
+                  bg="#E9F7F9"
+                />
+              );
+            }}
+            onEndReachedThreshold={0.2}
+            onEndReached={() => {
+              if (!isLoading) {
+                console.log({ loadNextPage: currentPage + 1 });
+                // debugger;
+                // setCurrentPage(currentPage + 1);
+
+                // this.fetchUser(this.page); // method for API call 
+              }
+            }}
+          />
+        </Box> */}
+        {/* {zecPagesItems.map(({ datetime, memo, id }, i) => (
           <ZecPostFeedItem key={id || `index-${i}`} createdAt={new Date(Number(datetime))} text={memo} mb={16} bg="#E9F7F9" />
-        ))}  
+        ))}   */}
       </Section>
       <a href="https://zecpages.com">
         <Text center fontSize={20} lineHeight={24} color="blue">

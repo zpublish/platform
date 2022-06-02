@@ -2,11 +2,12 @@ import React from 'react';
 
 import { Box, Text, useWindowDimensions } from 'elemental-react';
 
-import AppBar from '../../../../components/lib/common/AppBar';
-import Section from '../../../../components/lib/common/Section';
-import Footer from '../../../../components/lib/common/Footer';
+import AppBar from '@zpublish/components/lib/common/AppBar';
+import Section from '@zpublish/components/lib/common/Section';
+import Footer from '@zpublish/components/lib/common/Footer';
 // @ts-ignore
-import QrCode from '../../../../components/lib/qrcode';
+// import QrCode from '../../../../components/lib/qrcode';
+import { QRCode } from '@elemental-zcash/components';
 
 import { Link } from 'react-sketchapp-router';
 
@@ -35,7 +36,7 @@ const Home = () => {
       <Section pt="8px">
         <Box alignItems="center">
           <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Send 0.001 ZEC to</Text>
-          <QrCode
+          <QRCode
             bgColor="#ffffff"
             fgColor="#000000"
             includeMargin={true}

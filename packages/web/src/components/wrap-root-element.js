@@ -2,6 +2,8 @@ import React from 'react';
 import { ThemeProvider, LayoutProvider } from 'elemental-react';
 import { theme } from '@elemental-zcash/components';
 import { RPNativeProvider } from '@react-platform/native';
+import { QueryClient, QueryClientProvider } from 'react-query'
+
 
 import useWindowViewport from '../hooks/use-window-viewport';
 
@@ -18,6 +20,8 @@ if (typeof window !== 'undefined' && WebFont) {
     },
 });
 }
+
+const queryClient = new QueryClient({});
 
 const fontSizes = [96, 60, 48, 34, 24, 20, 16, 14];
 const [h1, h2, h3, h4, h5, h6] = fontSizes;
@@ -66,17 +70,19 @@ const processStyleFunc = (style) => ({ ...style });
 
 export default ({ element }) => {
   return (
-    <RPNativeProvider processStyle={processStyleFunc}>
-      <ThemeProvider
-        design={{ Button: {} }}
-        // @ts-ignore
-        colorMode="day"
-        theme={theme}
-      >
-        <Wrapper>
-          {element}
-        </Wrapper>
-      </ThemeProvider>
-    </RPNativeProvider>
+    <QueryClientProvider client={queryClient}>
+      <RPNativeProvider processStyle={processStyleFunc}>
+        <ThemeProvider
+          design={{ Button: {} }}
+          // @ts-ignore
+          colorMode="day"
+          theme={theme}
+        >
+          <Wrapper>
+            {element}
+          </Wrapper>
+        </ThemeProvider>
+      </RPNativeProvider>
+    </QueryClientProvider>
   );
 };

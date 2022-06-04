@@ -61,3 +61,10 @@ a {
 	text-decoration: unset;
 	color: unset;
 }
+
+input:focus-visible {
+	outline: none;
+}
+input, textarea {
+	all: unset;
+}

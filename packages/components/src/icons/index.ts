@@ -6,5 +6,6 @@ export { FavoriteIcon, ShareIcon } from './icons';
 // export { default as ShareIcon } from './ShareIcon';
 export { default as ZcashIcon } from './ZcashIcon';
 export { default as ZcashHeartIcon } from './ZcashHeartIcon';
+export { default as PollIcon } from './PollIcon';
 
 

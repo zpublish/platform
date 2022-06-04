@@ -9,15 +9,20 @@ import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-f
 import Modal from 'react-modal';
 import { useInfiniteQuery } from 'react-query';
 import { InfiniteLoader, List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller } from 'react-virtualized';
-import Measure from 'react-measure'
+import Measure from 'react-measure';
+import { Formik } from 'formik';
 
 // import crypto from 'crypto';
 // import fetch from 'sync-fetch/index';
 
-import { Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button, AutoTextArea } from '@elemental-zcash/components';
+import {
+  Icon, TextInput, InputField, TruncatedZAddress, CryptoAddressCopy, QRCode, Button, AutoTextArea, Select,
+} from '@elemental-zcash/components';
 import { MicroPostFeedItem, ZecPostFeedItem } from '@zpublish/components';
 import Section from '@zpublish/components/lib/common/Section';
 import FlatList from '@zpublish/components/lib/common/FlatList';
+
+import { PollIcon } from '@zpublish/components/lib/icons';
 
 
 // import data from '../../../../components/data/home_timeline.json';
@@ -46,6 +51,14 @@ const toBase64 = (text) => {
     return btoa(text);
   }
 };
+
+const postOptions = {
+  post: 'Post',
+  tweet: 'Post and Tweet',
+  highlight: 'Highlighted Post',
+};
+
+const postSelectOptions = Object.entries(postOptions).map(([value, label]) => ({ value, label }))
 
 // const MicroPostFeedItem = ({ id, user, retweetUser, createdAt, isRepliedTo, retweetedStatus, quotedStatus, text, inReplyToStatusId }) => {
 //   const [tipVisible, setTipVisible] = useState(false);
@@ -245,6 +258,23 @@ const aggregateDataById = (dataList) => {
   })
 }
 
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
+}
+
+const encodeMemo = (memo) => toBase64(unescape(encodeURIComponent(memo))).replace('=', '');
+
+const postTypeToAmount = {
+  post: 0.001,
+  tweet: 0.01,
+  highlight: 0.1,
+};
+const postTypeToLabel = {
+  post: 'Standard Post',
+  tweet: 'Post With Tweet',
+  highlight: 'Highlighted Post',
+};
+
 const TimelineFeed = () => {
   const { theme } = useTheme();
   const [items, setItems] = useState(userTimelineData);
@@ -254,7 +284,7 @@ const TimelineFeed = () => {
   const [modalState, setModalState] = useState(null);
   const { width } = useWindowDimensions();
   const zecpagesAddress = 'zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f';
-  const zecpagesPostAmount = 0.001;
+  const [zecpagesPostAmount, setZecpagesPostAmount] = useState(0.001);
   const [memo, setMemo] = useState('');
   const { state: zecPagesState, addReply } = useZecPages();
   // const [list, setList] = useState();
@@ -297,7 +327,7 @@ const TimelineFeed = () => {
   } = useInfiniteQuery(
     'zecpages_board',
     async ({ pageParam = 1 }) => {
-      const isDev = false;
+      const isDev = true;
       const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
       const res = await fetch(url);
       const data = await res.json();
@@ -502,44 +532,181 @@ const TimelineFeed = () => {
           </a>
         </Text>
       </Box>
-      <Box px={[16, 40]} mb={16}>
-        <InputField
-          label="Write your post here..."
-          // onTextChange={(value) => {
-          //   setMemo(value);
-          // }}
-          value={memo}
-          labelVisible={false}
+      <Section px={[16, 40]} mb={16}>
+        <Formik
+          initialValues={{ amount: postTypeToAmount.post, postingState: 'writing', postType: 'post', post: '' }}
+          onSubmit={values => console.log(values)}
         >
-          {({ label, value }) =>
-            // <TextInput
-            //   p={16}
-            //   borderColor="#313880"
-            //   placeholderColor="#636363"
-            //   borderWidth={2}
-            //   label={label}
-            //   value={value}
-            //   onChange={(event) => {
-            //     // setTextAreaHeight("auto");
-            //     // setParentHeight(`${textAreaRef.current.scrollHeight}px`);
-            //     // setText(event.target.value);
-            
-            //     setMemo(event.target.value);
-            //   }}
-            //   multiline
-            // /> 
-            // What’s up?
-            <AutoTextArea placeholder="Write your post here..." value={value} onChangeText={(text) => {
-              setMemo(text);
-              console.log({ text });
-            }}/>
-          }
-        </InputField>
-      </Box>
-      <Box px={[16, 40]} mb={16}>
+          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+            <Box>
+              {{
+                writing: (
+                  <>
+                    <Row>
+                      <Box minWidth={64}>
+                        <Select
+                          options={postSelectOptions}
+                          // menuPlacement="auto"
+                          optionNoWrap
+                          // menuPosition="fixed"
+                          styles={{
+                            // singleValue: ({ ...css }) => ({ whiteSpace: 'nowrap', ...css }),
+                            menu: ({ width, ...css }) => ({ minWidth: 156, ...css }),
+                          }}
+                          onChange={(({ value }, __) => setFieldValue('amount', postTypeToAmount[value]))}
+                          defaultValue={postSelectOptions[Object.keys(postOptions).indexOf(getKeyByValue(postTypeToAmount, values.amount))]}
+                        />
+                      </Box>
+                    </Row>
+                    {{
+                      post: (
+                        <InputField
+                          mt="16px"
+                          label="Write your post here..."
+                          // onTextChange={(value) => {
+                          //   setMemo(value);
+                          // }}
+                          value={values.post}
+                        >
+                          {({ label, value }) =>
+                            <AutoTextArea placeholder="Write your post here..." value={value} onChangeText={(text) => {
+                              setFieldValue('post', text);
+                              console.log({ text });
+                            }}/>
+                          }
+                        </InputField>
+                      ),
+                      poll: (
+                        <Box mt={2}>
+                          <InputField
+                            label="Question"
+                            value={values.question}
+                            mb={2}
+                          >
+                            {({ label, value, placeholder }) => (
+                              <TextInput
+                                // label={label}
+                                value={value}
+                                label={label}
+                                onChange={handleChange('question')}
+                                // onChangeText={(text) => setFieldValue}
+                              />
+                            )}
+                          </InputField>
+                          {[
+                            { value: 'option_1', label: 'Option 1' },
+                            { value: 'option_2', label: 'Option 2' },
+                            { value: 'option_3', label: 'Option 3' },
+                            { value: 'option_4', label: 'Option 4' },
+                          ].map(({ label, value: optionValue }) => (
+                            <InputField
+                              label={label}
+                              value={values[optionValue]}
+                            >
+                              {({ label, value, placeholder }) => (
+                                <TextInput
+                                  // label={label}
+                                  value={value}
+                                  label={label}
+                                  onChange={handleChange(optionValue)}
+                                  // onChangeText={(text) => setFieldValue}
+                                />
+                              )}
+                            </InputField>
+                          ))}
+                          <Button onPress={() => setFieldValue('postType', 'post')}>
+                            Delete Poll
+                          </Button>
+                        </Box>
+                      ),
+                    }[values.postType]}
+                    <Row>
+                      <Box style={{ cursor: 'pointer' }} onPress={() => {
+                        if (values.postType !== 'poll') {
+                          setFieldValue('postType', 'poll');
+                        } else if (values.postType === 'poll') {
+                          setFieldValue('postType', 'post');
+                        }
+                      }}>
+                        <PollIcon size={32} fill={values.postType === 'poll' ? '#0561f5' : '#737373'} />
+                      </Box>
+                      <Box flex={1} />
+                      <Button onPress={() => {
+                        const { amount } = values;
+
+                        setFieldValue('postingState', 'submitting');
+                        setZecpagesPostAmount(amount);
+
+                        switch(values.postType) {
+                          case 'post': {
+                            setMemo(encodeMemo(values.post));
+                            break;
+                          }
+                          case 'poll': {
+                            const { question, option_1, option_2, option_3, option_4 } = values;
+                            const memoObj = {
+                              q: question,
+                              o1: option_1,
+                              o2: option_2,
+                              o3: option_3,
+                              o4: option_4,
+                            };
+                            const memo = `POLL::{${JSON.stringify(memoObj)}}`;
+                            setMemo(encodeMemo(memo));
+
+                            break;
+                          }
+                        }
+                        // setMemo(values.post)
+                      }}>
+                        POST
+                      </Button>
+                    </Row>
+                    </>
+                  ),
+                  submitting: (
+                    <>
+                      <Box alignItems="center">
+                        <Text fontFamily="IBM Plex Mono" fontSize={24} mb={12}>Scan or copy address</Text>
+                        <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>{postTypeToLabel[getKeyByValue(postTypeToAmount, values.amount)]} is {values.amount} ZEC</Text>
+                        <QRCode
+                          bgColor="#ffffff"
+                          fgColor="#000000"
+                          includeMargin={true}
+                          style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
+                          // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
+                          value={zecPagesAddressUri}
+                        />
+                        <Box mt={24} width={width * 0.55}>
+                          <ThemeProvider theme={{ ...theme, colors: { ...theme.colors, icons: { ...theme.colors.icons, qrcode_box: '#fff' } }}}>
+                            <CryptoAddressCopy
+                              bg="#224259"
+                              color="white"
+                              address={zecpagesAddress}
+                              onCopyPress={async () => {
+                                await copyTextToClipboard(zecPagesAddressUri);
+                              }}
+                              onQrcodePress={() => {
+                                setModalState('zecpages_qrcode');
+                              }}
+                            />
+                          </ThemeProvider>
+                          <Button mt={24} mx="0px" onPress={() => setFieldValue('postingState', 'writing')}>
+                            DONE
+                          </Button>
+                        </Box>
+                      </Box>
+                    </>
+                  )
+                }[values.postingState]}
+            </Box>
+          )}
+        </Formik>
+      </Section>
+      {/* <Box px={[16, 40]} mb={16}>
         <Box>
           <ThemeProvider theme={{ ...theme, colors: { ...theme.colors, icons: { ...theme.colors.icons, qrcode_box: '#fff' } }}}>
-            <CryptoAddressCopy /*bg="#313880"*/
+            <CryptoAddressCopy
               bg="#224259"
               color="white"
               address={zecpagesAddress}
@@ -548,12 +715,11 @@ const TimelineFeed = () => {
               }}
               onQrcodePress={() => {
                 setModalState('zecpages_qrcode');
-                // console.log('qrcode');
               }}
             />
           </ThemeProvider>
         </Box>
-      </Box>
+      </Box> */}
       <Section py={16} flex={1}>
         <Box flex={1}>
           <FlatList

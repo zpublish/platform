@@ -34,6 +34,7 @@ exports.onCreateWebpackConfig = ({
         'react-native': path.resolve(__dirname, './src/mock.js'),
         'react-native-web': resolveNodeModulePath('react-native-web'),
         'simple-masonry-layout': resolveNodeModulePath('simple-masonry-layout'),
+        'react-select': resolveNodeModulePath('react-select'),
         'react-primitives': resolveNodeModulePath('react-primitives'),
         'react-primitives-svg': resolveNodeModulePath('react-primitives-svg'),
         'react-primitives-svg': resolveNodeModulePath('react-primitives-svg'),
@@ -55,7 +56,7 @@ exports.onCreateWebpackConfig = ({
         // ),
   
       },
-      extensions: getConfig().resolve.extensions.concat('.web.js'),
+      extensions: ['.web.js'].concat(getConfig().resolve.extensions),
     },
   });
 };

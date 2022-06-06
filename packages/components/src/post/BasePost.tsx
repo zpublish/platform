@@ -37,7 +37,7 @@ export const AnonProfileNamesRow = ({ username, name }: { username?: string, nam
 export const PostText = ({ text }: { text?: string }) => (
   <Box pt="4px">
     {text ? (// @ts-ignore
-      <Text fontSize={16} fontFamily="Helvetica" style={{ wordBreak: 'break-work' }}>
+      <Text fontSize={16} fontFamily="Helvetica" style={{ wordBreak: 'break-word' }}>
         {text}
       </Text>
     ) : <TextPlaceHolder />}

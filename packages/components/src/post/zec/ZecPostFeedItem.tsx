@@ -9,7 +9,7 @@ import { getTimeAgo } from '../../utils/time';
 import { FavoriteIcon, LinkIcon, ReplyIcon, ShareIcon, ZcashHeartIcon } from '../../icons';
 
 const ZecPostFeedItem = ({
-  id, username, name, createdAt, replyToPostId, replyCount, text, likeCount, ...props
+  id, username, name, createdAt, replyToPostId, replyCount, text, likeCount, onPressLike, onPressReply, ...props
 }: {
   id?: string | number,
   username?: string,
@@ -20,6 +20,8 @@ const ZecPostFeedItem = ({
   // inReplyToStatusId?: string,
   replyToPostId?: number,
   text?: string,
+  onPressLike: () => void,
+  onPressReply: () => void,
 }) => {
   const isRepliedTo = !!replyToPostId;
   let textContent = text;
@@ -62,15 +64,19 @@ const ZecPostFeedItem = ({
           </Box>
           <Row mt={12} justifyContent="space-between">
             <Box
-              as="a"// @ts-ignore
-              href="#"
-              onClick={() => {
-                // setMemoContent(`TIP_TWEET:${id}`);
-                // setTipVisible(!tipVisible);
-              }}
+              // as="a"// @ts-ignore
+              // @ts-ignore
+              style={{ cursor: 'pointer' }}
+              // onClick={onPressLike}
+              // onClick={() => {
+              //   // setMemoContent(`TIP_TWEET:${id}`);
+              //   // setTipVisible(!tipVisible);
+              // }}
             >
               <Row alignItems="center">
-                <ZcashHeartIcon />
+                <Box onClick={onPressLike}>
+                  <ZcashHeartIcon />
+                </Box>
                 {likeCount > 0 && <Text ml={1} color="#5F6E7A">{likeCount}</Text>}
               </Row>
             </Box>
@@ -84,7 +90,7 @@ const ZecPostFeedItem = ({
               ].map(({ component: Comp, id: actionId }) => {
                 const hrefById: any = {
                   link: `https://zecpages.com/z/post/${id}/`,
-                  reply: `https://zecpages.com/z/post/${id}/`,
+                  // reply: `https://zecpages.com/z/post/${id}/`,
                   // repost: `https://twitter.com/intent/retweet?tweet_id=${id}`,
                   // favorite: `https://twitter.com/intent/like?tweet_id=${id}`,
                 };
@@ -94,11 +100,13 @@ const ZecPostFeedItem = ({
                   <Row
                     alignItems="center"
                     mr={16}
-                    as="a"
+                    as={actionId === 'link' && 'a'}
                     {...actionId !== 'share' && hrefById[actionId] && { href: hrefById[actionId], rel: 'noopener noreferrer', target: '_blank' }}
                     onClick={(actionId === 'share')
                       ? () => { if (typeof nav !== 'undefined' && nav?.canShare && nav.share) { nav?.share({ url: `https://zecpages.com/z/post/${id}/`}) } }
-                      : undefined
+                      : (actionId === 'reply'
+                        ? onPressReply
+                        : undefined)
                     }
                     >
                     <Comp fill="#5F6E7A" />

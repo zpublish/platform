@@ -52,6 +52,8 @@ const toBase64 = (text) => {
   }
 };
 
+const byteSize = str => new Blob([str]).size;
+
 const postOptions = {
   post: 'Post',
   tweet: 'Post and Tweet',
@@ -264,6 +266,26 @@ function getKeyByValue(object, value) {
 
 const encodeMemo = (memo) => toBase64(unescape(encodeURIComponent(memo))).replace('=', '');
 
+
+const makeMemoReply = (post, replyToId) => {
+  return `REPLY::${replyToId} ${post}`
+};
+
+const makeMemoFromPoll = ({ question, option_1, option_2, option_3, option_4 }) => {
+  const memoObj = {
+    q: question,
+    o1: option_1,
+    o2: option_2,
+    o3: option_3,
+    o4: option_4,
+  };
+  const memo = `POLL::{${JSON.stringify(memoObj)}}`;
+
+  return memo;
+}
+
+
+
 const postTypeToAmount = {
   post: 0.001,
   tweet: 0.01,
@@ -281,8 +303,8 @@ const TimelineFeed = () => {
   const [zecPagesItems, setZecPagesItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [modalState, setModalState] = useState(null);
-  const { width } = useWindowDimensions();
+  const [modalState, setModalState] = useState({});
+  const { width, height } = useWindowDimensions();
   const zecpagesAddress = 'zs1j29m7zdhhyy2eqrz89l4zhk0angqjh368gqkj2vgdyqmeuultteny36n3qsm47zn8du5sw3ts7f';
   const [zecpagesPostAmount, setZecpagesPostAmount] = useState(0.001);
   const [memo, setMemo] = useState('');
@@ -426,7 +448,7 @@ const TimelineFeed = () => {
   // };
 
   const closeModal = () => {
-    setModalState(null);
+    setModalState({});
   }
 
 
@@ -459,7 +481,7 @@ const TimelineFeed = () => {
   return (
     <Box flex={1}>
       <Modal
-        isOpen={!!modalState}
+        isOpen={!!modalState.isOpen}
         // onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         style={{
@@ -476,7 +498,7 @@ const TimelineFeed = () => {
         contentLabel="Modal"
       >
         {{
-          zecpages_qrcode: (
+          like_post: (
             <Box p={40}>
               <Row>
                 <Box flex={1} />
@@ -510,19 +532,185 @@ const TimelineFeed = () => {
                 </ThemeProvider>
               </Row>
               <Box alignItems="center">
-                <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Send 0.001 ZEC to</Text>
+                <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Like this post with 0.001 ZEC</Text>
                 <QRCode
                   bgColor="#ffffff"
                   fgColor="#000000"
                   includeMargin={true}
                   style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
                   // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
-                  value={zecPagesAddressUri}
+                  value={`zcash:${zecpagesAddress}?amount=${modalState.amount || zecpagesPostAmount}&memo=${modalState.memo}`}
                 />
               </Box>
             </Box>
           ),
-        }[modalState]}
+          reply_post: (
+            <Box p={40}>
+              <Row>
+                <Box flex={1} />
+                <ThemeProvider
+                  theme={{
+                    ...theme,
+                    colors: {
+                      ...theme.colors,
+                      btn: {
+                        ...theme.colors.btn,
+                        bg: 'rgba(0, 0, 0, 1)',
+                        hoverBg: 'rgb(40, 40, 40)',
+                        focusBg: 'rgb(60, 60, 60)',
+                        text: '#fff'
+                        // disabledBg: '#E4E2E2',
+                        // disabledText: '#7D7D7D',
+                        // text: '#000000',
+                        // textBtn: {
+                        //   text: '#000',
+                        //   hoveredBg: '#FFF7E5',
+                        //   focusedBg: '#FFF1D1',
+                        //   pressedBg: '#FFF1D1',
+                        //   disabledText: '#7D7D7D',
+                        // }
+                    }
+                  }
+                }}>
+                  <Button fontFamily="IBM Plex Sans" color="white" fontSize={14} fontWeight="bold" onClick={closeModal} mb={32}>
+                    CLOSE
+                  </Button>
+                </ThemeProvider>
+              </Row>
+              <Box alignItems="center" flex={1}>
+                <Formik
+                  initialValues={{ amount: postTypeToAmount.post, postingState: 'writing', postType: 'post', post: '' }}
+                  validate={(values) => {
+                    const errors = {};
+
+                    return errors;
+                  }}
+                >
+                  {({ values, setFieldValue, errors }) => (
+                    <Box flexDirection={['column', 'column', 'row']}>
+                      <Box flex={1}>
+                        <ZecPostFeedItem
+                          width="100%"
+                          createdAt={new Date(Number(modalState.post?.datetime))}
+                          replyToPostId={modalState?.post?.reply_to_post}
+                          text={modalState?.post?.memo}
+                          replyCount={modalState?.post?.replyCount}
+                          likeCount={modalState?.post?.likes}
+                          id={modalState?.post?.id}
+                          mb={16}
+                        />
+                        <Box width="100%" flex={1}>
+                          <Box width="3px" height={32} bg="#E9F7F9" ml={64} mt={-16} />
+                          <Box
+                            {...{ bg: 'white', borderWidth: 1, borderColor: '#c5d3d5', ml: 32 }}
+                            borderRadius={12}
+                            flex={1}
+                            p={16}
+                            mb={3}
+                          >
+                            <InputField
+                              width="100%"
+                              label="Write your reply here..."
+                              error={errors.post}
+                              value={values.post}
+                            >
+                              {({ label, value }) =>
+                                <AutoTextArea
+                                  placeholder={label}
+                                  value={value}
+                                  onChangeText={(text) => {
+                                    setFieldValue('post', text);
+                                  }}
+                                  borderBottomWidth={0}
+                                  pb={0}
+                                />
+                              }
+                            </InputField>
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box alignItems="center" px={[16, 40]} flexShrink={1}>
+                        <Text fontFamily="IBM Plex Mono" fontSize={24} mb={2} center>Reply to this post with 0.001 ZEC</Text>
+                        <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24} center>Scan or copy:</Text>
+                        <Box bg="#224259" p={3} borderRadius={3}>
+                          <QRCode
+                            // bgColor="#224259"
+                            backgroundColor={false}
+                            color="white"
+                            includeMargin={true}
+                            style={{ width: Math.min(width, height) * 0.35, height: Math.min(width, height) * 0.35, maxHeight: 512, maxWidth: 512 }}
+                            // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
+                            value={`zcash:${zecpagesAddress}?amount=${modalState.amount || zecpagesPostAmount}&memo=${encodeMemo(makeMemoReply(values.post, modalState.post?.id))}`}
+                          />
+                        </Box>
+                        <CryptoAddressCopy
+                          bg="#224259"
+                          color="white"
+                          address={zecpagesAddress}
+                          onCopyPress={async () => {
+                            await copyTextToClipboard(`zcash:${zecpagesAddress}?amount=${modalState.amount || zecpagesPostAmount}&memo=${encodeMemo(makeMemoReply(values.post, modalState.post?.id))}`);
+                          }}
+                          // onQrcodePress={() => {
+                          //   setModalState('zecpages_qrcode');
+                          // }}
+                          showQrCode={false}
+                          maxWidth={width * 0.35}
+                          mt={3}
+                        />
+                      </Box>
+                    </Box>
+                  )}
+                </Formik>
+              </Box>
+            </Box>
+          ),
+          // zecpages_qrcode: (
+          //   <Box p={40}>
+          //     <Row>
+          //       <Box flex={1} />
+          //       <ThemeProvider
+          //         theme={{
+          //           ...theme,
+          //           colors: {
+          //             ...theme.colors,
+          //             btn: {
+          //               ...theme.colors.btn,
+          //               bg: 'rgba(0, 0, 0, 1)',
+          //               hoverBg: 'rgb(40, 40, 40)',
+          //               focusBg: 'rgb(60, 60, 60)',
+          //               text: '#fff'
+          //               // disabledBg: '#E4E2E2',
+          //               // disabledText: '#7D7D7D',
+          //               // text: '#000000',
+          //               // textBtn: {
+          //               //   text: '#000',
+          //               //   hoveredBg: '#FFF7E5',
+          //               //   focusedBg: '#FFF1D1',
+          //               //   pressedBg: '#FFF1D1',
+          //               //   disabledText: '#7D7D7D',
+          //               // }
+          //           }
+          //         }
+          //       }}>
+          //         <Button fontFamily="IBM Plex Sans" color="white" fontSize={14} fontWeight="bold" onClick={closeModal} mb={32}>
+          //           CLOSE
+          //         </Button>
+          //       </ThemeProvider>
+          //     </Row>
+          //     <Box alignItems="center">
+          //       <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Send 0.001 ZEC to</Text>
+          //       <QRCode
+          //         bgColor="#ffffff"
+          //         fgColor="#000000"
+          //         includeMargin={true}
+          //         style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
+          //         // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
+          //         value={zecPagesAddressUri}
+          //       />
+          //     </Box>
+          //   </Box>
+          // ),
+        }[modalState.type]}
       </Modal>
       <Box px={[32, 40]} py={20} center>
         <Text fontSize={20} fontFamily="secondary" center bold>
@@ -535,9 +723,50 @@ const TimelineFeed = () => {
       <Section px={[16, 40]} mb={16}>
         <Formik
           initialValues={{ amount: postTypeToAmount.post, postingState: 'writing', postType: 'post', post: '' }}
-          onSubmit={values => console.log(values)}
+          onSubmit={(values) => {
+            // console.log(values)
+
+            // const memo = 
+            // setMemo();
+          }}
+          validate={(values) => {
+            const errors = {};
+            const { amount, postingState, postType, post } = values;
+
+            let memo;
+
+            switch(postType) {
+              case 'post': {
+                memo = encodeMemo(post);
+
+                if (byteSize(memo) >= 512) {
+                  errors.post = 'Zcash memos are capped to 512 bytes, please shorten your post.';
+                } else if (!memo) {
+                  errors.post = 'Please enter some text';
+                }
+                break;
+              }
+              case 'poll': {
+                const { question, option_1, option_2, option_3, option_4 } = values;
+                memo = makeMemoFromPoll(({ question, option_1, option_2, option_3, option_4 }));
+
+                if (byteSize(memo) >= 512) {
+                  errors.poll = 'Zcash memos are capped to 512 bytes, please shorten your poll.';
+                }
+
+                if (!question) {
+                  errors.question = 'Please enter a question.';
+                }
+                break;
+              }
+            }
+          
+            //...
+          
+            return errors;
+          }}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+          {({ handleChange, handleBlur, handleSubmit, values, errors, setFieldValue, touched }) => (
             <Box>
               {{
                 writing: (
@@ -563,16 +792,22 @@ const TimelineFeed = () => {
                         <InputField
                           mt="16px"
                           label="Write your post here..."
+                          // FIXME: Add touched handling for UX
+                          error={errors.post}
                           // onTextChange={(value) => {
                           //   setMemo(value);
                           // }}
                           value={values.post}
                         >
                           {({ label, value }) =>
-                            <AutoTextArea placeholder="Write your post here..." value={value} onChangeText={(text) => {
-                              setFieldValue('post', text);
-                              console.log({ text });
-                            }}/>
+                            <AutoTextArea
+                              placeholder="Write your post here..."
+                              value={value}
+                              onChangeText={(text) => {
+                                setFieldValue('post', text);
+                              }}
+                              style={{ wordBreak: 'break-word' }}
+                            />
                           }
                         </InputField>
                       ),
@@ -581,6 +816,7 @@ const TimelineFeed = () => {
                           <InputField
                             label="Question"
                             value={values.question}
+                            error={errors.question}
                             mb={2}
                           >
                             {({ label, value, placeholder }) => (
@@ -602,6 +838,7 @@ const TimelineFeed = () => {
                             <InputField
                               label={label}
                               value={values[optionValue]}
+                              error={errors[optionValue]}
                             >
                               {({ label, value, placeholder }) => (
                                 <TextInput
@@ -614,7 +851,21 @@ const TimelineFeed = () => {
                               )}
                             </InputField>
                           ))}
-                          <Button onPress={() => setFieldValue('postType', 'post')}>
+                          {errors.poll ? (
+                            <Text color="error" fontSize={14} mb={2}>
+                              {errors.poll}
+                            </Text>
+                          ) : undefined}
+                          <Button
+                            onPress={() => {
+                              setFieldValue('postType', 'post');
+                              setFieldValue('question', undefined);
+                              setFieldValue('option_1', undefined);
+                              setFieldValue('option_2', undefined);
+                              setFieldValue('option_3', undefined);
+                              setFieldValue('option_4', undefined);
+                            }}
+                          >
                             Delete Poll
                           </Button>
                         </Box>
@@ -631,34 +882,40 @@ const TimelineFeed = () => {
                         <PollIcon size={32} fill={values.postType === 'poll' ? '#0561f5' : '#737373'} />
                       </Box>
                       <Box flex={1} />
-                      <Button onPress={() => {
+                      <Button
+                        disabled={Object.keys(errors).length > 0}
+                        onPress={Object.keys(errors).length === 0 ? () => {
                         const { amount } = values;
+                        
 
                         setFieldValue('postingState', 'submitting');
                         setZecpagesPostAmount(amount);
 
                         switch(values.postType) {
                           case 'post': {
+                            if (!values.post) {
+                              setFieldValue('postingState', 'writing');
+                              return;
+                            }
                             setMemo(encodeMemo(values.post));
                             break;
                           }
                           case 'poll': {
                             const { question, option_1, option_2, option_3, option_4 } = values;
-                            const memoObj = {
-                              q: question,
-                              o1: option_1,
-                              o2: option_2,
-                              o3: option_3,
-                              o4: option_4,
-                            };
-                            const memo = `POLL::{${JSON.stringify(memoObj)}}`;
+                            if (!question) {
+                              setFieldValue('postingState', 'submitting');
+                              return;
+                            }
+                            const memo = makeMemoFromPoll(({ question, option_1, option_2, option_3, option_4 }))
+                            
                             setMemo(encodeMemo(memo));
+
 
                             break;
                           }
                         }
                         // setMemo(values.post)
-                      }}>
+                      } : undefined}>
                         POST
                       </Button>
                     </Row>
@@ -686,9 +943,10 @@ const TimelineFeed = () => {
                               onCopyPress={async () => {
                                 await copyTextToClipboard(zecPagesAddressUri);
                               }}
-                              onQrcodePress={() => {
-                                setModalState('zecpages_qrcode');
-                              }}
+                              // onQrcodePress={() => {
+                              //   setModalState('zecpages_qrcode');
+                              // }}
+                              showQrCode={false}
                             />
                           </ThemeProvider>
                           <Button mt={24} mx="0px" onPress={() => setFieldValue('postingState', 'writing')}>
@@ -749,6 +1007,21 @@ const TimelineFeed = () => {
                     likeCount={likes}
                     id={id}
                     mb={16}
+                    onPressLike={() => {
+                      setModalState({
+                        ...modalState,
+                        isOpen: true,
+                        memo: encodeMemo(`LIKE::${id}`),
+                        type: 'like_post'
+                      });
+                    }}
+                    onPressReply={() => {
+                      setModalState({
+                        isOpen: true,
+                        type: 'reply_post',
+                        post: item
+                      })
+                    }}
                     // bg="#E9F7F9"
                   />
                   {replyCount > 0 && zecPagesState[id] && Object.keys(zecPagesState[id]).map((k, i) => {
@@ -777,6 +1050,21 @@ const TimelineFeed = () => {
                           id={replyPost.id}
                           mt={0}
                           mb={16}
+                          onPressLike={() => {
+                            setModalState({
+                              ...modalState,
+                              isOpen: true,
+                              memo: encodeMemo(`LIKE::${id}`),
+                              type: 'like_post'
+                            });
+                          }}
+                          onPressReply={() => {
+                            setModalState({
+                              isOpen: true,
+                              type: 'reply_post',
+                              post: replyPost
+                            })
+                          }}
                           // bg="#E9F7F9"
                         />
                       </>

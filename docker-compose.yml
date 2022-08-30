@@ -1,0 +1,40 @@
+version: '3'
+services:
+  api:
+    build: ./packages/api
+    ports:
+     - "8081:8081"
+    environment:
+      - PORT=8081
+    networks:
+      - zpublish_net
+    env_file:
+      ./packages/api/.env
+    #volumes:
+    #  - ./packages/api:/usr/src/app
+    links:
+      - redis
+    depends_on:
+      - redis
+  redis:
+    image: redis:6
+    command: ["redis-server", "/etc/redis/redis.conf", "--requirepass ${REDIS_PSWD}"]
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PORT=6379
+    networks:
+      - zpublish_net
+  load_balancer:
+    build: ./docker/nginx
+    ports:
+      - "8080:8080"
+    networks:
+      - zpublish_net
+    depends_on:
+      - redis
+      - api
+networks:
+  zpublish_net:

@@ -110,3 +110,5 @@ dist
 public/
 public2/
 packages/design/data/
+redis.conf
+packages/api/data/zecpages/

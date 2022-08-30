@@ -39,7 +39,12 @@ const makeRouter = (app) => {
           const { message } = detail || {};
 
           // Hack to strip regex from error (security) TODO: Clean up
-          res.status(500).send((message && message.split(': /')[0]) || 'Error!');
+          const errorMessage = (message && message.split(': /')[0]) || 'Error!';
+          const errorJson = { type: 'ValidationError', message: errorMessage };
+          
+          res.set('Content-Type', 'text/json');
+          res.status(500).send(JSON.stringify({ error: [].concat(errorJson) }));
+          // res.end();
         } else {
           handler(req, res);
         }

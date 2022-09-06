@@ -1,0 +1,31 @@
+version: '3' # Version of the Docker Compose file format
+services:
+  letsencrypt-nginx-proxy-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    container_name: letsencrypt-nginx-proxy-companion
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "nginx-conf:/etc/nginx/conf.d"
+      - "nginx-vhost:/etc/nginx/vhost.d"
+      - "html:/usr/share/nginx/html"
+      - "certs:/etc/nginx/certs:rw"
+    depends_on: # Make sure we start nginx proxy container first
+        - nginx-proxy
+  api:
+    environment:
+      - VIRTUAL_HOST=zpublish.org
+      - VIRTUAL_PORT=8081
+  nginx-proxy:
+    ports:
+      - "80:80"
+      - "443:443"
+networks:
+  default:
+    external:
+      name: nginx-proxy
+volumes: # Names of volumes that out containers will share. Those will persist on docker's host machine.
+  nginx-conf:
+  nginx-vhost:
+  html:
+  certs:COPY

@@ -1,0 +1,17 @@
+version: '3' # Version of the Docker Compose file format
+services:
+  nginx-proxy:
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./docker/html:/var/www/html
+      - ./certs:/etc/nginx/certs
+      - ./docker/vhost.d:/etc/nginx/vhost.d:ro
+  database:
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=zpublish_local
+      - POSTGRES_MAIN_DB=zpublish_local
+      - POSTGRES_PASSWORD_zpublish_local=${POSTGRES_PSWD}
+  api:
+    environment:
+      - VIRTUAL_HOST=zpublish.local
+      - VIRTUAL_PORT=8081

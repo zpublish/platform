@@ -1,0 +1,14 @@
+version: '3'
+name: zpublish
+services:
+  zpublish_web:
+    build: ./packages/web
+    environment:
+      - PORT=3000
+    env_file: ./packages/web/.env
+    networks:
+      - elemental_net
+networks:
+  elemental_net:
+    external: true
+    driver: bridge

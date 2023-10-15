@@ -4,6 +4,7 @@ import Link from '../common/Link';
 import { config } from '../../config';
 import useIsLoggedIn from '../../lib/hooks/use-is-logged-in';
 import { AccountCircle } from '../icons';
+import { ProfileDropdownMenu } from './profile-dropdown';
 
 // const NavContainer = styled(Box)`
 //   position: sticky;
@@ -76,7 +77,13 @@ const Nav: FC<Props> = ({ showLogo }) => {
               {isLoggedIn ? (
                 <>
                   <Box height={40} width={40} alignItems="center" justifyContent="center">
-                    <AccountCircle size={40} color="gray" />
+                    {/* <Link href="/profile/settings"> */}
+                    <ProfileDropdownMenu>
+                      <button className="IconButton" aria-label="Customise options">
+                        <AccountCircle size={40} color="gray" />
+                      </button>
+                    </ProfileDropdownMenu>
+                    {/* </Link> */}
                   </Box>
                 </>
               ) : (

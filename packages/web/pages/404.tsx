@@ -6,7 +6,7 @@ import Section from '../components/common/Section';
 // import RegisterForm from '../components/register/register-form';
 
 
-export default function NotFound() {
+export default function Error404() {
 //   const { loading, data, error, client } = useQuery<{ viewer: Viewer | ViewerNotFoundError }>(GET_VIEWER);
   // const [sendVerificationEmail, { data: verificationData, loading: verificationLoading, error: verificationError }] = useMutation<{ sendVerificationEmail: boolean }, { address: string }>(SEND_VERIFICATION_EMAIL);
   // const apolloClient = useApolloClient();

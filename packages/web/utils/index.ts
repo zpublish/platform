@@ -4,3 +4,4 @@ export const extractBearerToken = (headers: { authorization?: string }) =>
 
 export * from './copy';
 export * from './string';
+export * from './styles';

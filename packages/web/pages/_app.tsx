@@ -1,3 +1,4 @@
+import '../styles/globals.css';
 import { AppProps } from 'next/app'
 import React from 'react';
 import { ThemeProvider, LayoutProvider } from 'elemental-react';

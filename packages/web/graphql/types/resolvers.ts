@@ -62,6 +62,7 @@ export type Invoice = {
 };
 
 export type InvoiceInput = {
+  address: Scalars['String']['input'];
   currency: CurrencyCode;
   price: Scalars['Float']['input'];
 };

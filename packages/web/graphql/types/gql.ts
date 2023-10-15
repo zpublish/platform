@@ -14,11 +14,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query invoice($id: ID!) {\n    invoice(id: $id) {\n      __typename\n      ...on Invoice {\n        id\n        price\n        currency\n        status\n      }\n      ...on InvoiceNotFoundError {\n        message\n        code\n      }\n    }\n  }\n": types.InvoiceDocument,
+    "\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n": types.ViewerDocument,
     "\n  fragment UserInfo on User {\n    __typename\n    id\n    name\n    username\n    publicZcashaddress\n    zcashaddress\n    bio\n    # instagram\n  }\n": types.UserInfoFragmentDoc,
     "\n  fragment UserSettingsFragment on User {\n    email\n    name\n    username\n    publicZcashaddress\n    zcashaddress\n    bio\n    viewingKey\n  }\n": types.UserSettingsFragmentFragmentDoc,
-    "\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n": types.ViewerDocument,
     "\n  mutation updateUser($input: UpdateUserInput!) {\n    updateUser(input: $input) {\n      __typename\n      ...on UpdateUserSuccess {\n        user {\n          id\n          username\n          unverifiedEmail\n          isVerifiedEmail\n        }\n      }\n      ...on UpdateUserInputError {\n        message\n        code\n      }\n    }\n  }\n": types.UpdateUserDocument,
     "\n  query user($id: ID!) {\n    user(id: $id) {\n      __typename\n      ...on User {\n        id\n        username\n        name\n        bio\n        zcashaddress\n        socials {\n          youtube\n          instagram\n          twitter\n          website\n        }\n      }\n      ...on UserNotFoundError {\n        message\n        code\n      }\n    }\n  }\n": types.UserDocument,
+    "\n  mutation createInvoice($input: InvoiceInput!) {\n    createInvoice(input: $input) {\n      id\n      invoiceId\n      status\n      price\n      currency\n    }\n  }\n": types.CreateInvoiceDocument,
 };
 
 /**
@@ -42,6 +43,10 @@ export function graphql(source: "\n  query invoice($id: ID!) {\n    invoice(id: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n"): (typeof documents)["\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  fragment UserInfo on User {\n    __typename\n    id\n    name\n    username\n    publicZcashaddress\n    zcashaddress\n    bio\n    # instagram\n  }\n"): (typeof documents)["\n  fragment UserInfo on User {\n    __typename\n    id\n    name\n    username\n    publicZcashaddress\n    zcashaddress\n    bio\n    # instagram\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -50,15 +55,15 @@ export function graphql(source: "\n  fragment UserSettingsFragment on User {\n  
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n"): (typeof documents)["\n  query Viewer {\n    viewer {\n      id\n      email\n      name\n      username\n      publicZcashaddress\n      zcashaddress\n      bio\n      socials {\n        instagram\n        youtube\n        twitter\n        website\n      }\n      viewingKey\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "\n  mutation updateUser($input: UpdateUserInput!) {\n    updateUser(input: $input) {\n      __typename\n      ...on UpdateUserSuccess {\n        user {\n          id\n          username\n          unverifiedEmail\n          isVerifiedEmail\n        }\n      }\n      ...on UpdateUserInputError {\n        message\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation updateUser($input: UpdateUserInput!) {\n    updateUser(input: $input) {\n      __typename\n      ...on UpdateUserSuccess {\n        user {\n          id\n          username\n          unverifiedEmail\n          isVerifiedEmail\n        }\n      }\n      ...on UpdateUserInputError {\n        message\n        code\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query user($id: ID!) {\n    user(id: $id) {\n      __typename\n      ...on User {\n        id\n        username\n        name\n        bio\n        zcashaddress\n        socials {\n          youtube\n          instagram\n          twitter\n          website\n        }\n      }\n      ...on UserNotFoundError {\n        message\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  query user($id: ID!) {\n    user(id: $id) {\n      __typename\n      ...on User {\n        id\n        username\n        name\n        bio\n        zcashaddress\n        socials {\n          youtube\n          instagram\n          twitter\n          website\n        }\n      }\n      ...on UserNotFoundError {\n        message\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation createInvoice($input: InvoiceInput!) {\n    createInvoice(input: $input) {\n      id\n      invoiceId\n      status\n      price\n      currency\n    }\n  }\n"): (typeof documents)["\n  mutation createInvoice($input: InvoiceInput!) {\n    createInvoice(input: $input) {\n      id\n      invoiceId\n      status\n      price\n      currency\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

@@ -19,6 +19,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  invoices      Invoice[]
   bio                 String?
   socials             Json?    @map("socials")
   zcashaddress        String?
@@ -62,8 +63,12 @@ model VerificationToken {
 
 model Invoice {
   id         String   @id @default(cuid())
-  invoiceId  String   @unique
+  // invoiceId  String   @unique
+  userId     String
+  // user User @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   currency   String
+  amount     String
   walletId   String   @unique
 }
 

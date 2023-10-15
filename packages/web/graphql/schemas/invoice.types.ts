@@ -25,6 +25,7 @@ export default /* GraphQL */ `
   input InvoiceInput {
     price: Float!
     currency: CurrencyCode!
+    address: String!
     # address: String
   }
 

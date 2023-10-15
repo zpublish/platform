@@ -70,9 +70,9 @@ export default function Home() {
           </Row>
         </Section> */}
         <Section>
-          {/* <ZecPagesProvider>
+          <ZecPagesProvider>
             <ZecPagesTimeline />
-          </ZecPagesProvider> */}
+          </ZecPagesProvider>
         </Section>
       </Layout>
     </Box>

@@ -36,12 +36,13 @@ const userResolvers: Resolvers = {
       if (!_user?.id) {
         return null;
       }
-      const { socials, ...user } = _user;
+      // const { socials, ...user } = _user;
+      const { viewingKey, ...user } = _user; // Filter out viewing Key (i.e. if not viewer)
 
       return {
         __typename: 'User',
         id,
-        ...(_user as any),
+        ...(user as any),
       };
     },
     viewer: async (obj, args, context: GraphQLContext) => {

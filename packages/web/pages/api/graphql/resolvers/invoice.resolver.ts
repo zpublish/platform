@@ -78,7 +78,7 @@ const userResolvers: Resolvers = {
       // const wallet = await fetch(`${ZEC_RPC_GATEWAY_HOSTNAME}/wallet/${user?.zcashaddress}`)
       const wallet: { id?: number, jsonrpc: '2.0', result: TransactionsResult } = await getWalletStatus({ walletId: invoice.walletId });
 
-      console.log({ result: wallet.result, walletId: invoice.walletId });
+      console.log({ result: wallet.result, walletId: invoice.walletId, 'user.zcashaddress': user.zcashaddress, 'invoice.amount': invoice.amount });
       const paid = wallet.result.some(({ address, amount }) => {
         if (address === user.zcashaddress && (amount === Number(invoice.amount))) {
           return true;
@@ -139,7 +139,9 @@ const userResolvers: Resolvers = {
         if (!wallet.wallet_id) {
           throw new Error("Couldn't find wallet");
         }
-        const res = await context.prisma.invoice.findFirst({ where: { walletId: wallet.wallet_id }});
+        /*
+        TODO: Decide whether to implement this for session to restore invoice
+        const res = await context.prisma.invoice.findFirst({ where: { walletId: wallet.wallet_id, amount: String(price) }});
         if (res) {
           return {
             __typename: 'Invoice',
@@ -148,6 +150,7 @@ const userResolvers: Resolvers = {
             status: InvoiceStatus.NEW, // FIXME:
           }
         }
+        */
       }
       console.log({ wallet })
       const wallet_id = wallet?.wallet_id;

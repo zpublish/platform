@@ -123,6 +123,7 @@ export default function User() {
   const [invoiceStage, setInvoiceStage] = useState<InvoiceStage | null>(null);
   const [amount, setAmount] = useState(initialAmount);
   const [memo, setMemo] = useState('');
+  // const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   // const [currency, setCurrency] = useState(initialCurrency);
   // const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [createInvoice] = useMutation(CREATE_INVOICE);
@@ -167,9 +168,11 @@ export default function User() {
                   <Box position="fixed" width="100%" left={0} top={0} height="100%" zIndex={9999} bg="white" alignItems="center" justifyContent="center">
                     <Box
                       onPress={() => {
-                        router.replace({
-                          query: { id },
-                       });
+                        if (invoiceStage === InvoiceStage.INVOICE_PAID && invoice_id) {
+                          router.replace({
+                            query: { id },
+                          });
+                        }
                         setInvoiceStage(null);
                       }}
                       position="absolute" zIndex={99999} right={32} top={32} style={{ cursor: 'pointer' }}
@@ -298,6 +301,7 @@ export default function User() {
                               zcashaddress={userData?.zcashaddress}
                               memo={memo}
                               onPaymentSuccess={() => {
+                                // setPaymentSuccessful(true);
                                 setInvoiceStage(InvoiceStage.INVOICE_PAID);
                               }}
                             />

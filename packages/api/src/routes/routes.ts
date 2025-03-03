@@ -4,7 +4,10 @@ import Joi from '@hapi/joi';
 // import {
 //   users,
 //  } from '../controllers';
-import homeTimeline from '../controllers/home-timeline';
+// import homeTimeline from '../controllers/home-timeline';
+import boardController from '../controllers/board.controller';
+
+const homeTimeline = { get: () => {} };
 
 const schemas = {
   uuid: Joi.string().guid({
@@ -14,6 +17,12 @@ const schemas = {
 };
 
 const routes = {
+  '/api/0.1/board/:id': {
+    GET: {
+      handler: boardController.get,
+      validation: boardController.validation,
+    },
+  },
   '/api/0.1/home_timeline': {
     GET: {
       handler: homeTimeline.get,

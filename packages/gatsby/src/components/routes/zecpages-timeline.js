@@ -23,6 +23,7 @@ import Section from '@zpublish/components/lib/common/Section';
 import FlatList from '@zpublish/components/lib/common/FlatList';
 
 import { PollIcon } from '@zpublish/components/lib/icons';
+import { InvoiceElement } from 'elemental-pay';
 
 
 // import data from '../../../../components/data/home_timeline.json';
@@ -349,8 +350,8 @@ const TimelineFeed = () => {
   } = useInfiniteQuery(
     'zecpages_board',
     async ({ pageParam = 1 }) => {
-      const isDev = false;
-      const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
+      const isDev = process.env.NODE_ENV === 'development';
+      const url = isDev ? `https://127.0.0.1:8080/api/0.1/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -493,14 +494,19 @@ const TimelineFeed = () => {
             marginRight: '-50%',
             transform: 'translate(-50%, -50%)',
             padding: 0,
+            // height: height * 0.85,
+            height: '100vh',
+            width: '100vw',
+            border: 'none'
+            // maxWidth: '100vw'
           },
         }}
         contentLabel="Modal"
       >
         {{
           like_post: (
-            <Box p={40}>
-              <Row>
+            <Box height="100%" py={40} flex={1}>
+              <Row px={40}>
                 <Box flex={1} />
                 <ThemeProvider
                   theme={{
@@ -531,8 +537,15 @@ const TimelineFeed = () => {
                   </Button>
                 </ThemeProvider>
               </Row>
-              <Box alignItems="center">
-                <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Like this post with 0.001 ZEC</Text>
+              <Box px={40} alignItems="center" flex={1}>
+                <InvoiceElement
+                  onCopyPress={async () => {
+                    await copyTextToClipboard(`zcash:${zecpagesAddress}?amount=${modalState.amount}&memo=${modalState.memo}`);
+                    // setCopyIsClicked(true);
+                    // setTimeout(() => { setCopyIsClicked(false); setCopyIsHovered(false); }, 200);
+                  }}
+                />
+                {/* <Text fontFamily="IBM Plex Mono" fontSize={24} mb={24}>Like this post with 0.001 ZEC</Text>
                 <QRCode
                   bgColor="#ffffff"
                   fgColor="#000000"
@@ -540,7 +553,7 @@ const TimelineFeed = () => {
                   style={{ width: width * 0.55, height: width * 0.55, maxHeight: 512, maxWidth: 512 }}
                   // value={`zcash:${zaddr}?amount=0.001&memo=${memo}`}
                   value={`zcash:${zecpagesAddress}?amount=${modalState.amount || zecpagesPostAmount}&memo=${modalState.memo}`}
-                />
+                /> */}
               </Box>
             </Box>
           ),

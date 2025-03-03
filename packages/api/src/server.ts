@@ -1,9 +1,9 @@
 import http from 'http';
 // import RedisServer from 'redis-server';
 import { promisify } from 'util';
-// import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 
-// dotenv.config();
+dotenv.config();
 
 // const redisServer = new RedisServer(6379);
 // redisServer.open((err) => {
@@ -23,7 +23,7 @@ import { promisify } from 'util';
 import app from './app';
 // import redisListener from './listeners/redis-listener';
 
-const port = process.env.port || 1337;
+const port = process.env.PORT || 1337;
 
 const server = http.createServer(app);
 

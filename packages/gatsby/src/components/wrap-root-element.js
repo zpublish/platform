@@ -16,7 +16,7 @@ try {
 if (typeof window !== 'undefined' && WebFont) {
   WebFont.load({
     google: {
-      families: ['IBM Plex Sans', 'IBM Plex Serif', 'IBM Plex Mono']
+      families: ['IBM Plex Sans', 'IBM Plex Serif', 'IBM Plex Mono:300,400,500,700']
     },
 });
 }

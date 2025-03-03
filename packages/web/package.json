@@ -38,6 +38,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
+    "elemental-color": "0.0.3",
     "elemental-react": "^0.4.1",
     "formik": "^2.2.9",
     "graphql": "^16.6.0",
@@ -53,12 +54,12 @@
     "react-measure": "^2.5.2",
     "react-modal": "^3.16.1",
     "react-native-web": "^0.15.1",
-    "react-primitives": "^0.8.1",
-    "react-primitives-svg": "0.0.3",
-    "react-query": "^3.39.2",
+    "react-primitives": "^0.8.0",
+    "react-query": "^3.37.0",
     "react-select": "^5.4.0",
-    "react-virtualized": "^9.22.5",
-    "styled-components": "^5.3.11",
+    "react-virtualized": "^9.22.3",
+    "simple-masonry-layout": "^1.4.0",
+    "styled-components": "^5.0.1",
     "styled-system": "^5.1.5",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
@@ -66,22 +67,29 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/client-preset": "^4.1.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-react-apollo": "^3.3.7",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
-    "@graphql-typed-document-node/core": "^3.2.0",
-    "@types/graphql": "^14.5.0",
-    "@types/node": "^18.7.15",
-    "@types/react": "^18.0.18",
-    "apollo": "^2.34.0",
-    "autoprefixer": "^10.4.16",
-    "dotenv": "^16.0.3",
-    "postcss": "^8.4.31",
-    "prisma": "^5.3.1",
-    "tailwindcss": "^3.3.3",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.8.2"
+    "gh-pages": "^2.2.0",
+    "prettier": "^1.19.1"
+  },
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
+    "start": "npm run develop & npm start:nginx",
+    "start:nginx": "nginx -g \"daemon off;\"",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zpublish/platform"
+  },
+  "bugs": {
+    "url": "https://github.com/zpublish/platform/issues"
   }
 }

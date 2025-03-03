@@ -12,13 +12,9 @@ services:
       - "certs:/etc/nginx/certs:rw"
     depends_on: # Make sure we start nginx proxy container first
         - nginx-proxy
-  database:
-    environment:
-      - POSTGRES_MAIN_DB=zpublish_staging
-      - POSTGRES_MULTIPLE_DATABASES=zpublish_staging
   api:
     environment:
-      - VIRTUAL_HOST=staging.zpublish.org
+      - VIRTUAL_HOST=zpublish.org
       - VIRTUAL_PORT=8081
   nginx-proxy:
     ports:

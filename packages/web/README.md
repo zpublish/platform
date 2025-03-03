@@ -1,5 +1,3 @@
-# site
-
 Microblog App - Website
 
 <!--
@@ -21,3 +19,12 @@ cp nginx/nginx.conf /usr/local/etc/nginx/nginx.conf
 npm run start:nginx & npm start
 ``` 
 -->
+
+```sh
+# Force update database schema and types
+npm run prisma:push
+```
+
+```sh
+
+```

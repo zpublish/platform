@@ -1,60 +1,14 @@
 version: '3'
+name: zpublish
 services:
-  redis:
-    image: redis:6
-    command: ["redis-server", "/etc/redis/redis.conf", "--requirepass ${REDIS_PSWD}"]
-    volumes:
-      - ./redis.conf:/etc/redis/redis.conf
+  zpublish_web:
+    build: ./packages/web
     environment:
-      - REDIS_PORT=6379
+      - PORT=3000
+    env_file: ./packages/web/.env
     networks:
-      - zpublish_net
-  database:
-    build: ./docker/postgres
-    volumes:
-      - ./docker/data:/var/lib/postgresql/data
-      # - ./docker/postgres-init:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_MAIN_DB=zpublish
-      - POSTGRES_MULTIPLE_DATABASES=zpublish
-      # - POSTGRES_USER=zpublish
-      # TODO: Find a way to initialise without superuser
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PSWD}
-    networks:
-      - zpublish_net
-  nginx-proxy:
-    image: nginxproxy/nginx-proxy:0.9.1-alpine
-    container_name: nginx-proxy
-    #volumes:
-    #  - ./vhost.d:/etc/nginx/vhost.d:ro
-    # build: ./docker/nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    #environment:
-    #  - DEFAULT_HOST=error.local
-    networks:
-      - zpublish_net
-    depends_on:
-      - redis
-  api:
-    build: ./packages/api
-    environment:
-      - PORT=8081
-    networks:
-      - zpublish_net
-    env_file:
-      ./packages/api/.env
-    #volumes:
-    #  - ./packages/api:/usr/src/app
-    links:
-      - redis
-      - database
-    depends_on:
-      - nginx-proxy
-      - redis
+      - elemental_net
 networks:
-  zpublish_net:
+  elemental_net:
+    external: true
+    driver: bridge

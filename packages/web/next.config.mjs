@@ -31,7 +31,8 @@ const nextConfig = (phase, { defaultConfig }) => {
   }
 
   const nextConfig = {
-    output: 'standalone',
+    // output: 'standalone',
+    output: 'export',
     reactStrictMode: true,
     ...config,
   };

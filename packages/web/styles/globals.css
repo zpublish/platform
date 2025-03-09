@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* #020817 */
+
 @layer base {
   :root {
     --background: 236 87% 63%;
@@ -34,10 +36,13 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 0.5rem;
+
+    /* custom */
+    --gradient: linear-gradient(to top left,#00F5A0,#00D9F5);
   }
 
   .dark {
-    --background: 236 87% 8%;
+    --background: 236 87% 0%;
     --foreground: 213 31% 91%;
 
     --muted: 223 47% 11%;
@@ -52,14 +57,14 @@
     --border: 216 34% 17%;
     --input: 216 34% 17%;
 
-    --card: 224 71% 4%;
+    --card: 222.86 84% 4.9%;
     --card-foreground: 213 31% 91%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
+    --primary: 42 91% 61%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 42 91% 61%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 42 91% 61%;
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
@@ -78,4 +83,6 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  .bg-gradient { background: var(--gradient) }
 }

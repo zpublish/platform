@@ -10,6 +10,7 @@ const TextVariants = cva(
     variants: {
       font: {
         sans: "font-sans",
+        mono: "font-mono",
       },
       italic: {
         true: ["italic"],
@@ -34,17 +35,19 @@ export interface ButtonProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof TextVariants> {
   asChild?: boolean;
+  as?: string;
 }
 
 type Font = 'body' | 'largeTitle' | 'sans';
 
 const Text = React.forwardRef<HTMLDivElement, ButtonProps>(
-  ({ className, font, italic, bold, underline, asChild = false, ...props }, ref) => {
+  ({ as, className, font, italic, bold, underline, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "span"; // @ts-expect-error 123
     const Heading = ({
       body: 'p',
+      extraLargeTitle: 'h1',
       largeTitle: 'h3',
-    } as { [key in Exclude<typeof font, null | undefined>]: string })[font as Font] || Comp;
+    } as { [key in Exclude<typeof font, null | undefined>]: string })[font as Font] || as || Comp;
     return (
       <Heading
         className={cn(TextVariants({ font, italic, bold, underline, className }))}

@@ -17,8 +17,8 @@ import { VStack } from '../ui/vstack';
 //   color: '#737373'
 // }));
 
-const NameText = extend(Text, "font-sans text-base leading-[20px]", () => ({ bold: true }));
-const UsernameText = extend(Text, "text-black dark:text-white text-[10px] leading-[12px]");
+const NameText = extend(Text, "font-mono font-bold text-base leading-[20px]", () => ({ bold: true }));
+const UsernameText = extend(Text, "font-mono text-black dark:text-white text-[10px] leading-[12px]");
 
 
 export const TextPlaceHolder = () => (
@@ -36,7 +36,7 @@ export const TextPlaceHolder = () => (
 //   </Box>
 // );
 export const AnonProfileNamesRow = ({ username, name }: { username?: string, name?: string }) => (
-  <VStack>
+  <VStack alignment="leading">
     {/* <NameText color="#737373" fontWeight={500} mb={1}>{name}</NameText> */}
     <NameText className="text-black dark:text-white font-medium mb-0.5">{name}</NameText>
     <UsernameText>{`${username}`}</UsernameText>
@@ -46,7 +46,7 @@ export const AnonProfileNamesRow = ({ username, name }: { username?: string, nam
 );
 
 export const PostText = ({ children }: { children?: string }) => (
-  <VStack className="pt-1">
+  <VStack alignment="leading" className="pt-1">
     {children ? (
       <Text className="text-base font-sans text-black dark:text-white" style={{ wordBreak: 'break-word' }}>
         {children}

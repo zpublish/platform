@@ -9,6 +9,23 @@ const hstackVariants = cva(
   {
     variants: {
       alignment: {
+        topLeading: 'items-start',
+        topTrailing: 'justify-end',
+        top: 'items-start justify-center',
+        center: 'items-center justify-center',
+        leading: 'items-center',
+        trailing: 'items-center justify-end',
+        bottom: 'items-end justify-center',
+        bottomLeading: 'items-end',
+        bottomTrailing: 'justify-end items-end',
+        none: '',
+      },
+      verticalAlignment: {
+        top: 'items-top',
+        center: 'justify-center',
+        bottom: 'items-end',
+      },
+      horizontalAlignment: {
         top: 'items-top',
         center: 'items-center',
         bottom: 'items-end',
@@ -19,9 +36,15 @@ const hstackVariants = cva(
       flex: {
         1: 'flex-1',
       },
-      spacing: {},
+      spacing: {
+        1: 'gap-1',
+        2: 'gap-2',
+        3: 'gap-3',
+      },
     },
-    defaultVariants: {},
+    defaultVariants: {
+      alignment: 'center',
+    },
   }
 );
 
@@ -32,11 +55,11 @@ export interface ButtonProps
 }
 
 const HStack = React.forwardRef<HTMLDivElement, ButtonProps>(
-  ({ className, alignment, spacing, asChild = false, flex, ...props }, ref) => {
+  ({ className, alignment, spacing, asChild = false, flex, justify, ...props }, ref) => {
     const Comp = asChild ? Slot : "div";
     return (
       <Comp
-        className={cn(hstackVariants({ alignment, spacing, flex, className }))}
+        className={cn(hstackVariants({ alignment, spacing, flex, justify, className }))}
         ref={ref}
         {...props}
       />

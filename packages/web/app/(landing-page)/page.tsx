@@ -3,12 +3,15 @@
 // import { env } from "@/env.mjs"
 // import { siteConfig } from "@/config/site"
 // import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+// import { Button } from "@/components/ui/button"
+// import { Textarea } from "@/components/ui/textarea"
 // import { useEffect, useRef, useState } from "react"
-import EllipsisBox from "@/components/ellipsis-box"
-import { Icons } from "@/components/icons"
+// import EllipsisBox from "@/components/ellipsis-box"
+// import { Icons } from "@/components/icons"
 import ZecPostFeedItem from "@/components/social/ZecPostFeedItem"
+
+import CreatePost from "@/components/create-post"
+import { Text } from "@/components/ui/text"
 
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 
@@ -39,49 +42,39 @@ import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 //   }
 // }
 
-
+const tileWidth = 246;
 
 export default async function IndexPage() {
-  // const stars = await getGitHubStars()
-  const addr = "u1rl2zw85dmjc8m4dmqvtstcyvdjn23n0ad53u5533c97affg9jq208du0vf787vfx4vkd6cd0ma4pxkkuc6xe6ue4dlgjvn9dhzacgk9peejwxdn0ksw3v3yf0dy47znruqftfqgf6xpuelle29g2qxquudxsnnen3dvdx8az6w3tggalc4pla3n4jcs8vf4h29ach3zd8enxulush89";
-
   return (
     <>
-      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
-          <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-6">
+          <Text as="h1" className="font-mono font-bold text-black text-2xl sm:text-5xl md:text-5xl mb-6 dark:text-primary">
             ZEC-powered Anonymous Memo Board
-          </h1>
-          <Textarea className="min-h-32 dark:bg-background text-black dark:text-white dark:border-2 dark:border-white" placeholder="Write your post here…" />
-          <div className="flex row bg-secondary dark:bg-primary w-full p-3 py-2">
-            <div className="w-full">
-              <div className="text-black">
-                <EllipsisBox text={addr} offset={12} />
-              </div>
-            </div>
-            <Icons.miniQrCode className="ml-3 text-black" />
-            <Icons.miniCopy className="ml-2 text-primary dark:text-secondary" style={{ filter: 'drop-shadow(1px 1px 0px rgba(0, 0, 0, .4))' }} />
-          </div>
-          <div className="flex w-full row justify-between">
-            <div className="flex flex-1" />
-            <Button variant="secondary" className="text-black">
-              SUBMIT POST
-            </Button>
-          </div>
+          </Text>
+          <CreatePost />
         </div>
+        {/* <HStack spacing={3} alignment="trailing" className="h-24 bg-slate-800">
+          <div className="p-4 bg-primary h-12">Test</div>
+          <div className="p-4 bg-primary h-12">Test</div>
+        </HStack>
+        <VStack spacing={3} alignment="center" className="h-40 bg-slate-800">
+          <div className="p-4 bg-primary w-20">Test</div>
+          <div className="p-4 bg-primary w-20">Test</div>
+        </VStack> */}
       </section>
-      <section id="open-source" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+      <section id="post-feed" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4">
           {zecPagesData.map(({ datetime, memo, id }, i) => (
-          <ZecPostFeedItem
-            key={id || `index-${i}`}
-            createdAt={new Date(Number(datetime))}
-            likeCount={0}
-            text={memo}
-            onPressLike={null as unknown as () => void}
-            onPressReply={null as unknown as () => void}
-          />
-        ))}  
+            <ZecPostFeedItem
+              key={id || `index-${i}`}
+              createdAt={new Date(Number(datetime))}
+              likeCount={0}
+              text={memo}
+              onPressLike={null as unknown as () => void}
+              onPressReply={null as unknown as () => void}
+            />
+          ))}
           {/* <ZecPostFeedItem
             id="123"
             likeCount={0}

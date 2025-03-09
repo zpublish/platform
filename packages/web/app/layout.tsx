@@ -1,4 +1,4 @@
-import { Inter as FontSans } from "next/font/google"
+import { Inter as FontSans, IBM_Plex_Mono as IBMPlexMono } from "next/font/google"
 // import localFont from "next/font/local"
 
 import "@/styles/globals.css"
@@ -14,7 +14,13 @@ import { Suspense } from "react";
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
+
+const fontMono = IBMPlexMono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["300", "500", "600", "700"],
+});
 
 // Font files can be colocated inside of `pages`
 // const fontHeading = localFont({
@@ -81,6 +87,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         className={cn(
           "min-h-screen bg-background font-sans antialiased dark:bg-black",
           fontSans.variable,
+          fontMono.variable,
           // fontHeading.variable
         )}
       >

@@ -13,7 +13,7 @@ const ProfileIcon = ({ size = 40, uri, children, ...props }: {
           <VStack
             bg="white"
             alignment="center"
-            className="rounded-[50%] p-1 border border-[#D2D2D2] bg-white w-10 h-10 items-center"
+            className="rounded-[50%] p-1 border border-[#D2D2D2] bg-white w-10 h-10"
             {...props}
           >
             {children}

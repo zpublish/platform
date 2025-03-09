@@ -42,6 +42,7 @@ export interface TruncateProps {
     @default ...
   */
   ellipsis?: string;
+  className?: string;
 }
 
 /**
@@ -137,6 +138,7 @@ const EllipsisBox = memo((props: TruncateProps) => {
           whiteSpace: 'nowrap',
           // display: !truncated ? 'none' : undefined
         }}
+        {...props}
       >
         {truncated ? calculatedText : (
           <div className="bg-[#DEDEDE] h-4 my-1 w-[100%]" />

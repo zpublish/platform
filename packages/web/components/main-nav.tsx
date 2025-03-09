@@ -22,7 +22,7 @@ export function MainNav({ items, children }: MainNavProps) {
   return (
     <div className="flex gap-6 md:gap-10">
       <Link href="/" className="hidden items-center space-x-2 md:flex">
-        <span className="hidden font-bold sm:inline-block text-white">
+        <span className="hidden font-bold sm:inline-block text-white dark:text-black">
           {siteConfig.name}
         </span>
       </Link>
@@ -35,8 +35,8 @@ export function MainNav({ items, children }: MainNavProps) {
               className={cn(
                 "flex items-center text-lg font-medium transition-colors hover:text-foreground/80 sm:text-sm",
                 item.href.startsWith(`/${segment}`)
-                  ? "text-foreground"
-                  : "text-foreground/60",
+                  ? "text-foreground dark:text-black"
+                  : "text-foreground/60 dark:text-black/80",
                 item.disabled && "cursor-not-allowed opacity-80"
               )}
             >
@@ -49,8 +49,8 @@ export function MainNav({ items, children }: MainNavProps) {
         className="flex items-center space-x-2 md:hidden"
         onClick={() => setShowMobileMenu(!showMobileMenu)}
       >
-        {showMobileMenu ? <Icons.close /> : <Icons.menu />}
-        <span className="font-bold">{siteConfig.name}</span>
+        {showMobileMenu ? <Icons.close className="text-white dark:text-black" /> : <Icons.menu className="text-white dark:text-black" />}
+        <span className="font-bold dark:text-black">{siteConfig.name}</span>
       </button>
       {showMobileMenu && items && (
         <MobileNav items={items}>{children}</MobileNav>

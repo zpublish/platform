@@ -84,10 +84,10 @@ export const Icons = {
   ),
   miniCopy: ({ ...props }: LucideProps) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <g clip-path="url(#clip0_188_720)">
+    {/* <g clip-path="url(#clip0_188_720)">
     <path d="M15.3598 4.56006H5.27979V16.0801H6.71979V6.00006H15.3598V4.56006ZM18.9598 7.44006H8.15979V20.4001H18.9598V7.44006ZM17.5198 18.9601H9.59979V8.88006H17.5198V18.9601Z" fill="#0F0C00"/>
     <path d="M23.0399 1.91992H1.91992V23.0399H23.0399V1.91992Z" stroke="#0F0C00" stroke-width="2"/>
-    </g>
+    </g> */}
     <g clip-path="url(#clip1_188_720)">
     <path d="M14.3998 3.6001H4.31982V15.1201H5.75982V5.0401H14.3998V3.6001ZM17.9998 6.4801H7.19982V19.4401H17.9998V6.4801ZM16.5598 18.0001H8.63982V7.9201H16.5598V18.0001Z" fill="currentColor"/>
     <path d="M22.08 0.959961H0.959961V22.08H22.08V0.959961Z" stroke="currentColor" stroke-width="2"/>
@@ -105,6 +105,22 @@ export const Icons = {
   shield: ({ ...props }: LucideProps) => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1Z" fill="currentColor"/>
+    </svg>
+  ),
+  zcashQrCode: ({ ...props }: LucideProps) => (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0 22C0 9.86741 9.86741 0 22 0C34.1326 0 44 9.86741 44 22C44 34.1326 34.1326 44 22 44C9.86741 44 0 34.1326 0 22ZM29.8475 11.7904V15.1384L20.5358 27.7681H29.8475V32.2088H23.8447V35.8885H20.1553V32.2088H14.1525V28.8607L23.4544 16.2311H14.1525V11.7904H20.1553V8.10089H23.8447V11.7904H29.8475Z" fill="currentColor" />
+    </svg>
+  ),
+  zcashQrCodeGradient: ({ ...props }: LucideProps) => (
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <defs>
+        <linearGradient id="qrCodeLinearGradient" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#ffe479"/>
+          <stop offset="100%" stop-color="#f4b728"/>
+        </linearGradient>
+      </defs>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0 22C0 9.86741 9.86741 0 22 0C34.1326 0 44 9.86741 44 22C44 34.1326 34.1326 44 22 44C9.86741 44 0 34.1326 0 22ZM29.8475 11.7904V15.1384L20.5358 27.7681H29.8475V32.2088H23.8447V35.8885H20.1553V32.2088H14.1525V28.8607L23.4544 16.2311H14.1525V11.7904H20.1553V8.10089H23.8447V11.7904H29.8475Z" fill="url(#qrCodeLinearGradient)" />
     </svg>
   ),
   twitter: Twitter,

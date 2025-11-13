@@ -1,13 +1,5 @@
-// import Link from "next/link"
 
-// import { env } from "@/env.mjs"
-// import { siteConfig } from "@/config/site"
-// import { cn } from "@/lib/utils"
-// import { Button } from "@/components/ui/button"
-// import { Textarea } from "@/components/ui/textarea"
-// import { useEffect, useRef, useState } from "react"
-// import EllipsisBox from "@/components/ellipsis-box"
-// import { Icons } from "@/components/icons"
+
 import ZecPostFeedItem from "@/components/social/ZecPostFeedItem"
 
 import CreatePost from "@/components/create-post"
@@ -15,10 +7,12 @@ import { Text } from "@/components/ui/text"
 
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 import FlatList from '@/components/FlatList';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
+// import { useRouter } from "next/navigation";
+import getPost, { getReplies } from "./actions";
 // import Feed from "./feed";
 
 
@@ -51,17 +45,31 @@ import { HStack } from '@/components/ui/hstack';
 
 const tileWidth = 246;
 
-export default async function IndexPage() {
-  
+export default async function IndexPage({ params, searchParams }: { params: { id: string }, searchParams: {} }) {
+  // const router = useRouter();
+  // const { id } = router.query;
+  const post = await getPost({ txid: params.id as string });
+  let replies;
+
+  if (post.reply_count > 0) {
+    replies = await getReplies({ id: post.id as number });
+    // setReplies(replies)
+  }
+  // useEffect(() => {
+  //   async function fetchReplies() {
+  //   }
+  //   fetchReplies();
+  // }, [post.reply_count]);
+
 
   return (
     <>
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
           <Text as="h1" className="font-mono font-bold text-black text-2xl sm:text-5xl md:text-5xl mb-6 dark:text-primary">
-            ZEC-powered Anonymous Memo Board
+            ZECPages Archive
           </Text>
-          <CreatePost />
+          {/* <CreatePost /> */}
         </div>
         {/* <HStack spacing={3} alignment="trailing" className="h-24 bg-slate-800">
           <div className="p-4 bg-primary h-12">Test</div>
@@ -74,50 +82,45 @@ export default async function IndexPage() {
       </section>
       <section id="post-feed" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10">
         <div className="container max-w-[64rem]">
+          <ZecPostFeedItem
+            key={`id-${post?.id}` || `txid-${post.txid}`}
+            createdAt={new Date(Number(post.datetime))}
+            replyToPostId={post.reply_to_post}
+            text={post.memo}
+            replyCount={post.reply_count ? post.reply_count : 0}
+            likeCount={post.likes}
+            id={post.id}
+            amount={post.amount}
+            // mb={16}
+            onPressLike={null as any}
+            onPressReply={null as any}
+          />
+          {!!replies && (
+                <div className="ml-10">
+                  {(replies.map((_post: any) => (
+                    <ZecPostFeedItem
+                      key={`id-${_post?.id}` || `txid-${_post.txid}`}
+                      createdAt={new Date(Number(_post.datetime))}
+                      replyToPostId={_post.reply_to_post}
+                      text={_post.memo}
+                      replyCount={post.reply_count ? post.reply_count : 0}
+                      likeCount={_post.likes}
+                      id={_post.id}
+                      amount={_post.amount}
+                      // mb={16}
+                      onPressLike={null as any}
+                      onPressReply={null as any}
+                  />
+                  )))}
+                </div>
+          )}
           {/* <Feed /> */}
         </div>
         <div className="container flex max-w-[64rem] flex-col items-center gap-4">
           <div className="flex flex-1 w-full">
           </div>
-          {/* {zecPagesData.map(({ datetime, memo, id }, i) => (
-            <ZecPostFeedItem
-              key={id || `index-${i}`}
-              createdAt={new Date(Number(datetime))}
-              likeCount={0}
-              text={memo}
-              onPressLike={null as unknown as () => void}
-              onPressReply={null as unknown as () => void}
-            />
-          ))} */}
-          {/* <ZecPostFeedItem
-            id="123"
-            likeCount={0}
-            onPressLike={null as unknown as () => void}
-            onPressReply={null as unknown as () => void}
-            text="I see so many friends who need not concern themselves with a seemingly grey sky"
-          /> */}
         </div>
       </section>
-      {/* <section id="open-source" className="container py-8 md:py-12 lg:py-24">
-        <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
-          <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-            Proudly Open Source
-          </h2>
-          <p className="max-w-[85%] leading-normal text-white sm:text-lg sm:leading-7">
-            ZECpages is open source and powered by open source software. <br />{" "}
-            The code is available on{" "}
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className="underline underline-offset-4"
-            >
-              GitHub
-            </Link>
-            .{" "}
-          </p>
-        </div>
-      </section> */}
     </>
   )
 }

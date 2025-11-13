@@ -39,6 +39,7 @@
 
     /* custom */
     --gradient: linear-gradient(to top left,#00F5A0,#00D9F5);
+    --gradient-dark: linear-gradient(to top left,#c8cae4, #aae4ff);
   }
 
   .dark {
@@ -85,4 +86,5 @@
   }
 
   .bg-gradient { background: var(--gradient) }
+  .bg-gradient-dark { background: var(--gradient-dark) }
 }

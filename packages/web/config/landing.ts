@@ -3,17 +3,25 @@
 export const marketingConfig = {
   mainNav: [
     {
-      title: "Users",
-      href: "/users",
+      title: "Archive",
+      href: "/archive",
     },
     {
-      title: "About",
-      href: "/about",
+      title: "Old Users",
+      href: "/archive/directory",
     },
-    {
-      title: "Blog",
-      href: "/blog",
-    },
+    // {
+    //   title: "Users",
+    //   href: "/users",
+    // },
+    // {
+    //   title: "About",
+    //   href: "/about",
+    // },
+    // {
+    //   title: "Blog",
+    //   href: "/blog",
+    // },
     // {
     //   title: "Documentation",
     //   href: "/docs",

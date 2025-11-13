@@ -19,35 +19,8 @@ import { useEffect } from 'react';
 import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-// import Feed from "./feed";
+import Feed from "./feed";
 
-
-// async function getGitHubStars(): Promise<string | null> {
-//   try {
-//     const response = await fetch(
-//       "https://api.github.com/repos/shadcn/taxonomy",
-//       {
-//         headers: {
-//           Accept: "application/vnd.github+json",
-//           Authorization: `Bearer ${env.GITHUB_ACCESS_TOKEN}`,
-//         },
-//         next: {
-//           revalidate: 60,
-//         },
-//       }
-//     )
-
-//     if (!response?.ok) {
-//       return null
-//     }
-
-//     const json = await response.json()
-
-//     return parseInt(json["stargazers_count"]).toLocaleString()
-//   } catch (error) {
-//     return null
-//   }
-// }
 
 const tileWidth = 246;
 
@@ -59,9 +32,9 @@ export default async function IndexPage() {
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
           <Text as="h1" className="font-mono font-bold text-black text-2xl sm:text-5xl md:text-5xl mb-6 dark:text-primary">
-            ZEC-powered Anonymous Memo Board
+            ZECPages Archive
           </Text>
-          <CreatePost />
+          {/* <CreatePost /> */}
         </div>
         {/* <HStack spacing={3} alignment="trailing" className="h-24 bg-slate-800">
           <div className="p-4 bg-primary h-12">Test</div>
@@ -74,7 +47,7 @@ export default async function IndexPage() {
       </section>
       <section id="post-feed" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10">
         <div className="container max-w-[64rem]">
-          {/* <Feed /> */}
+          <Feed />
         </div>
         <div className="container flex max-w-[64rem] flex-col items-center gap-4">
           <div className="flex flex-1 w-full">

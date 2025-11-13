@@ -13,7 +13,7 @@ export const getTimeAgo = (createdAt: Date) => {
   } else {
     const formatter = new Intl.DateTimeFormat('en-US', { month: 'short' });
     const shortMonth = formatter.format(createdAt);
-    timeAgoText = `${shortMonth} ${createdAt.getDate()}`;
+    timeAgoText = `${shortMonth} ${createdAt.getDate()} ${createdAt.getFullYear()}`;
   }
 
   return timeAgoText;

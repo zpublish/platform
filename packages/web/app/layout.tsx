@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster"
 // import { TailwindIndicator } from "@/components/tailwind-indicator"
 import { ThemeProvider } from "@/components/theme-provider";
 import { Suspense } from "react";
+import Providers from "./providers";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -91,14 +92,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
           // fontHeading.variable
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          {/* <Analytics /> */}
-          <Suspense>
-            <Toaster />
-          </Suspense>
-          {/* <TailwindIndicator /> */}
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+            {/* <Analytics /> */}
+            <Suspense>
+              <Toaster />
+            </Suspense>
+            {/* <TailwindIndicator /> */}
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

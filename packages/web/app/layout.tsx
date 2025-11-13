@@ -1,111 +1,108 @@
-// import { AppProps } from 'next/app'
-// import React from 'react';
-// import { ThemeProvider, LayoutProvider } from 'elemental-react';
-// import { theme } from '@elemental-zcash/components';
-// import { RPNativeProvider } from '@react-platform/native';
-// import { QueryClient, QueryClientProvider } from 'react-query';
-// import { ApolloProvider } from '@apollo/client';
-// import { SessionProvider } from 'next-auth/react'
-// import { IBM_Plex_Sans, IBM_Plex_Serif, IBM_Plex_Mono, Roboto, Roboto_Mono } from 'next/font/google'
+import { Inter as FontSans, IBM_Plex_Mono as IBMPlexMono } from "next/font/google"
+// import localFont from "next/font/local"
 
-// // If loading a variable font, you don't need to specify the font weight
-// // const inter = Inter({ subsets: ['latin'] })
-// const ibmPlexSans = IBM_Plex_Sans({
-//   subsets: ['latin'],
-//   weight: ['400', '500', '700'],
+import "@/styles/globals.css"
+
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toaster"
+// import { Analytics } from "@/components/analytics"
+// import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { ThemeProvider } from "@/components/theme-provider";
+import { Suspense } from "react";
+import Providers from "./providers";
+
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const fontMono = IBMPlexMono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["300", "500", "600", "700"],
+});
+
+// Font files can be colocated inside of `pages`
+// const fontHeading = localFont({
+//   src: "../assets/fonts/CalSans-SemiBold.woff2",
+//   variable: "--font-heading",
 // })
-// const ibmPlexSerif = IBM_Plex_Serif({
-//   subsets: ['latin'],
-//   weight: ['400', '500', '700'],
-// })
-// const ibmPlexMono = IBM_Plex_Mono({
-//   subsets: ['latin'],
-//   weight: ['400', '500', '700'],
-// })
-// const roboto = Roboto({ subsets: ['latin'], weight: ['400', '700'] })
-// const robotoMono = Roboto_Mono({ subsets: ['latin'], weight: ['400', '700'] });
 
-// import useWindowViewport from '../components/hooks/use-window-viewport';
-// import apolloClient from '../apollo-client';
+interface RootLayoutProps {
+  children: React.ReactNode
+}
 
-// import '../styles/layout.css';
-// import StyledComponentsRegistry from '../lib/registry';
+export const metadata = {
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  // keywords: [
+  //   "Next.js",
+  //   "React",
+  //   "Tailwind CSS",
+  //   "Server Components",
+  //   "Radix UI",
+  // ],
+  // authors: [
+  //   {
+  //     name: "",
+  //     url: "https://.com",
+  //   },
+  // ],
+  // creator: "",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [`${siteConfig.url}/og.jpg`],
+    // creator: "@",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
+}
 
-
-
-// const queryClient = new QueryClient({});
-
-// const fontSizes = [96, 60, 48, 34, 24, 20, 16, 14];
-// const [h1, h2, h3, h4, h5, h6] = fontSizes;
-
-// const roundTo = function(target, num) {
-//   var resto = target % num;
-//   if (resto <= num / 2) {
-//     return target - resto;
-//   } else {
-//     return target + num - resto;
-//   }
-// };
-
-// const lineHeights = [h1, h2, h3, h4, h5, h6].map(n =>
-//   roundTo(Math.abs(n * 1.15), 4),
-// );
-// // @ts-ignore
-// fontSizes.h1 = h1;
-
-// const typefaces = {
-//   ibmPlexSans: {
-//     light: ibmPlexSans.style.fontFamily,
-//     regular: ibmPlexSans.style.fontFamily,
-//     medium: ibmPlexSans.style.fontFamily,
-//     semiBold: ibmPlexSans.style.fontFamily,
-//     mono: ibmPlexMono.style.fontFamily,
-//   },
-// };
-
-
-// const getBreakpoint = (w) => {
-//   const width = Number(w);
-
-//   if (width <= 768) {
-//     return 0;
-//   }
-//   if (width <= 1024) {
-//     return 1;
-//   }
-
-//   return 2;
-// };
-
-// const Wrapper = ({ children }) => {
-//   const { width } = useWindowViewport();
-//   const breakpoint = getBreakpoint(width);
-
-//   return (
-//     <LayoutProvider breakpoint={breakpoint}>
-//       {children}
-//     </LayoutProvider>
-//   );
-// }
-
-// const processStyleFunc = (style) => ({ ...style });
-
-// const App = ({
-//   Component,
-//   pageProps: { session, ...pageProps },
-// }: AppProps) => {
-//   return (
-//     <>
-//       {/* <style jsx global>{`
-//         html {
-//           font-family: ${ibmPlexSans.style.fontFamily} ${ibmPlexSerif.style.fontFamily} ${ibmPlexMono.style.fontFamily} ${roboto.style.fontFamily};
-//         }
-//       `}</style> */}
-//       <StyledComponentsRegistry>
-        
-//       </StyledComponentsRegistry>
-//     </>
-//   );
-// };
-
-// export default App;
+export default function RootLayout({ children }: RootLayoutProps) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased dark:bg-black",
+          fontSans.variable,
+          fontMono.variable,
+          // fontHeading.variable
+        )}
+      >
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+            {/* <Analytics /> */}
+            <Suspense>
+              <Toaster />
+            </Suspense>
+            {/* <TailwindIndicator /> */}
+          </ThemeProvider>
+        </Providers>
+      </body>
+    </html>
+  )
+}

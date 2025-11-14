@@ -30,8 +30,8 @@ const queryClient = new QueryClient();
 //   return { rows, nextOffset: offset + 1 };
 // }
 
-const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, hasNextPage, isFetchingNextPage, isRefetching }: {
-  onEndReached: (_: { startIndex: number, stopIndex: number }) => Promise<({ pages: any[] }) | void>, data: { [key: string]: any }[], renderItem?: any, hasNextPage?: boolean, isFetchingNextPage: boolean, isRefetching: boolean, fetchNextPage: any, isFetching: boolean,
+const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, hasNextPage, isFetchingNextPage, isRefetching, status }: {
+  onEndReached: (_: { startIndex: number, stopIndex: number }) => Promise<({ pages: any[] }) | void>, data: { [key: string]: any }[], renderItem?: any, hasNextPage?: boolean, isFetchingNextPage: boolean, isRefetching: boolean, fetchNextPage: any, isFetching: boolean, status?: string,
 }) => {
 
   const allRows = data;

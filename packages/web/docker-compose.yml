@@ -1,0 +1,14 @@
+version: '3'
+services:
+  nextapp:
+    build:
+       context: .
+       dockerfile: Dockerfile
+    volumes:
+      - ./data/db.json:/app/data/db.json:ro
+    networks:
+      - generated_default
+
+networks:
+  generated_default:
+    external: true

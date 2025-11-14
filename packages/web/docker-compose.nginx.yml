@@ -1,0 +1,14 @@
+version: '3'
+services:
+  nextapp:
+    environment:
+      PORT: 3030
+      VIRTUAL_NETWORK: nginx-proxy
+      VIRTUAL_PORT: 3030
+      VIRTUAL_HOST: zecpublish.com
+      VIRTUAL_HOST_NAME: "zecpublish"
+      SSL_POLICY: Mozilla-Modern
+
+      # Let's encrypt settings
+      LETSENCRYPT_HOST: zecpublish.com
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-<no value>}

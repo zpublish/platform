@@ -51,5 +51,3 @@ export const LinkIcon = ({ fill = '#000' }) => (// @ts-ignore
 // const ZcashHeartIcon = VStack;
 
 
-
-export { ReplyIcon, ShareIcon };

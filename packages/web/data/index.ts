@@ -10,6 +10,9 @@ export type Data = {
   posts: {
     [key: string]: any,
   },
+  users: {
+    [key: string]: any,
+  },
   profiles?: {
     [key: string]: any,
   },
@@ -25,7 +28,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export async function getDb() {
-  const db = await JSONFilePreset<Data>(path.join(__dirname, './db.json'), { posts: [] });
+  const db = await JSONFilePreset<Data>(path.join(__dirname, './db.json'), { posts: [], users: [] });
 
   return db;
 }

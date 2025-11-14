@@ -1,126 +1,152 @@
-'use client'
-import React, { useState } from 'react';
-import { InfiniteLoader, List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller } from 'react-virtualized';
-import Measure from 'react-measure';
+import React from 'react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
+// import { faker } from '@faker-js/faker';
 
-export const cache = new CellMeasurerCache({
-  defaultHeight: 50,
-  fixedWidth: true
-});
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
-const FlatList = ({ onEndReached, data, renderItem, hasNextPage, isFetchingNextPage, isRefetching }: {
-  onEndReached: (_: { startIndex: number, stopIndex: number }) => Promise<({ pages: any[] }) | void>, data: { [key: string]: any }[], renderItem?: any, hasNextPage?: boolean, isFetchingNextPage: boolean, isRefetching: boolean
+// const randomNumber = (min: number, max: number) =>
+//   faker.number.int({ min, max });
+
+// const sentences = new Array(10000)
+//   .fill(true)
+//   .map(() => faker.lorem.sentence(randomNumber(20, 70)));
+
+const queryClient = new QueryClient();
+
+// async function fetchServerPage(
+//   limit: number,
+//   offset: number = 0
+// ): Promise<{ rows: Array<string>; nextOffset: number }> {
+//   const rows = new Array(limit)
+//     .fill(0)
+//     .map((_, i) => `Async loaded row #${i + offset * limit} ${sentences[i]}`);
+
+//   await new Promise((r) => setTimeout(r, 500));
+
+//   return { rows, nextOffset: offset + 1 };
+// }
+
+const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, hasNextPage, isFetchingNextPage, isRefetching }: {
+  onEndReached: (_: { startIndex: number, stopIndex: number }) => Promise<({ pages: any[] }) | void>, data: { [key: string]: any }[], renderItem?: any, hasNextPage?: boolean, isFetchingNextPage: boolean, isRefetching: boolean, fetchNextPage: any, isFetching: boolean,
 }) => {
-  // const [hasMoreRows, setHasMoreRows] = useState(true);
-  // const isRowLoaded = ({ index }: { index: number }) => !hasNextPage || !!data[index] || index < data.length;
-  const isRowLoaded = ({ index }: { index: number }) => !hasNextPage || !!data[index] || index < data.length;
-  // const rowCount = hasNextPage ? data.length + 1 : data.length;
-  const rowCount = hasNextPage ? data.length + 1 : data.length;
 
-  const loadMoreRows = async ({ startIndex, stopIndex }: { startIndex: number, stopIndex: number }) => {
-    if (hasNextPage && !(isFetchingNextPage || isRefetching)) {
-      // const pageParams = {
-      //   _start: props.startIndex,
-      //   _end: props.stopIndex + 1 - props.startIndex,
-      // } as any;
-      // console.log("handleLoadMoreRows", pageParams);
-      await onEndReached({ startIndex, stopIndex });
-    }
-    // const result = await onEndReached({ startIndex, stopIndex });
-    // const lastPage = result.pages[result.pages.length - 1];
-    // if (lastPage.length === 0) {
-    //   setHasMoreRows(false);
-    // }
-  }
+  const allRows = data;
 
-  const rowRenderer = ({ index, key, style, parent }: { index: number, key?: string, style?: any, parent?: any }) => {
-    let isLoaded = false;
-    let content;
-    let item: any;
+  const parentRef = React.useRef<HTMLDivElement>(null);
+  // const listRef = React.useRef<HTMLDivElement | null>(null);
 
-    if (!isRowLoaded({ index })) {
-      item = {};
-    } else {
-      isLoaded = true;
-      item = data[index];
+  const virtualizer = useWindowVirtualizer({
+    count: hasNextPage ? allRows.length + 1 : allRows.length,
+    // getScrollElement: () => parentRef.current,
+    estimateSize: () => 100,
+    overscan: 5,
+    // scrollMargin: parentRef.current?.offsetTop ?? 0,
+  });
+  
+
+  React.useEffect(() => {
+    const [lastItem] = [...virtualizer.getVirtualItems()].reverse();
+
+    if (!lastItem) {
+      return;
     }
 
-    return (
-      <CellMeasurer
-        cache={cache}
-        columnIndex={0}
-        key={key}
-        parent={parent}
-        rowIndex={index}
-      >
-        {({ measure, registerChild }: { measure: Function, registerChild: any }) => (
-          // 'style' attribute required to position cell (within parent List)
-          <div ref={registerChild} style={style}>
-            <Measure
-              bounds
-              onResize={(contentRect: any) => {
-                measure({ height: contentRect.bounds.height, width: contentRect.bounds.width })
-                // this.setState({ dimensions: contentRect.bounds })
-              }}
-            >
-              {({ measureRef }: { measureRef: any }) => (
-                <div ref={measureRef}>
-                  {renderItem({ item, index })}
-                </div>
-              )}
-            </Measure>
-          </div>
-        )}
-      </CellMeasurer>
-    );
-  };
+    if (
+      lastItem.index >= allRows.length - 1 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    hasNextPage,
+    fetchNextPage,
+    allRows.length,
+    isFetchingNextPage,
+    virtualizer.getVirtualItems(),
+  ]);
 
   return (
-    <InfiniteLoader
-      isRowLoaded={isRowLoaded}
-      loadMoreRows={loadMoreRows}
-      rowCount={rowCount}
-    >
-      {({ onRowsRendered, registerChild: registerChildLoader }) => (
-        <WindowScroller
-          // ref={this._setRef}
-          scrollElement={typeof window !== 'undefined' ? window : undefined}
-          // scrollElement={isScrollingCustomElement ? customElement : window}
+    <div>
+      {status === 'pending' ? (
+        <p>Loading...</p>
+      ) : status === 'error' ? (
+        <></>
+      ) : (
+        <div
+          ref={parentRef}
+          className="List"
+          // style={{
+          //   height: `500px`,
+          //   width: `100%`,
+          //   overflow: 'auto',
+          // }}
         >
-          {({ height, width, isScrolling, onChildScroll, scrollTop, registerChild }) => {
-            // console.log('WindowScroller height:', height);
-            // console.log('WindowScroller width:', width);
-            return (
-            <AutoSizer disableHeight>
-              {({ width: autoWidth }) => {
-                // console.log('AutoSizer width:', autoWidth);
-                
-                if (!height || !autoWidth) {
-                  // console.warn('Missing height or width, cannot render List');
-                  return null; // Prevent rendering if height or width is not available
-                }
-                return (
-                  <List
-                    ref={registerChildLoader}
-                    onRowsRendered={onRowsRendered}
-                    rowRenderer={rowRenderer}
-                    deferredMeasurementCache={cache}
-                    rowHeight={cache.rowHeight}
-                    rowCount={rowCount}
-                    height={height}
-                    autoHeight
-                    width={autoWidth}
-                    scrollTop={scrollTop}
-                    // {...otherProps}
-                  />
-                );
-              }}
-            </AutoSizer>
-          )}}
-        </WindowScroller>
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const isLoaderRow = virtualRow.index > allRows.length - 1;
+              const item = allRows[virtualRow.index];
+
+              return (
+                <div
+                  key={virtualRow.index}
+                  data-index={virtualRow.index}
+                  className={
+                    virtualRow.index % 2 ? 'ListItemOdd' : 'ListItemEven'
+                  }
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: 'absolute',
+                    transform: `translateY(${virtualRow.start}px)`,
+                    width: '100%',
+                  }}
+                  // style={{
+                  //   position: 'absolute',
+                  //   top: 0,
+                  //   left: 0,
+                  //   height: '100%',
+                  //   transform: `translateX(${virtualRow.start}px)`,
+                  // }}
+                >
+                  {isLoaderRow
+                    ? hasNextPage
+                      ? 'Loading more...'
+                      : 'Nothing more to load'
+                    : (
+                      <div>
+                        {renderItem({ item, index: virtualRow.index })}
+                      </div>
+                      )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
-    </InfiniteLoader>
+      <div>
+        {isFetching && !isFetchingNextPage ? 'Background Updating...' : null}
+      </div>
+      <br />
+      <br />
+      {process.env.NODE_ENV === 'development' ? (
+        <p>
+          <strong>Notice:</strong> You are currently running React in
+          development mode. Rendering performance will be slightly degraded
+          until this application is built for production.
+        </p>
+      ) : null}
+    </div>
   );
-};
+}
 
 export default FlatList;

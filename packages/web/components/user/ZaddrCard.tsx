@@ -51,16 +51,17 @@ export default function ZaddrCard ({user, copied, setCopied}: any) {
         copyTextToClipboard(zaddr)
         // setCopied(user.id)
     }
+    const regex = /^(https?:\/\/)?(www\.)?(x\.com|twitter\.com)(\/)?/;
       
     return(
         <div
-          className="flex flex-col w-[80%] text-center bg-card my-[1%] mx-[auto] p-4 text-white border border-black dark:border-[#00FF7F]"
+          className="flex flex-col w-[80%] text-center bg-card my-[1%] mx-[auto] p-4 text-black dark:text-white border border-black dark:border-[#00FF7F]"
         >
             <Link href={`/${user.username}`}><h2 className="username-link text-[22px]">{user.username}</h2></Link>
             {user.description ? <p className="user-description">{user.description}</p> : null }
             <div className="card-top-row">
               {user.zaddr && (
-                <div className="flex row bg-secondary dark:bg-gradient-dark w-full p-3 py-2 my-3">
+                <div className="flex row bg-gradient dark:bg-gradient-dark w-full p-3 py-2 my-3">
                   <div className="w-full">
                     <div className="text-black">
                       <EllipsisBoxWrapper text={user.zaddr} offset={12} />
@@ -74,10 +75,10 @@ export default function ZaddrCard ({user, copied, setCopied}: any) {
             {!qrVis 
                 ? null 
                 : <QRCode bgColor={darkMode ? "#111111" : '#0a5e55'} fgColor={darkMode ? "#087f73" : '#bec0fe'} includeMargin={true} size={256} value={`zcash:${user.zaddr}?amount=0.001`} />}
-            <div className="card-bottom-row flex flex-row justify-between py-5">              
+            <div className="card-bottom-row flex flex-row justify-between py-5 px-8">              
                 {user.proofposturl ? <a className="w-[40px]" target="_new" href={`${proofHttps}${user.proofposturl}`}><Image alt="green check mark" src={darkMode ? proofinactive :proofactive} /></a> : <Image className="w-[40px]" alt="white check mark" src={darkMode ? proofactive : proofinactive} />}
                 {user.website ? <a className="w-[40px]" target="_new" href={`${httpsString}${user.website}`}><Image alt="dark connected world" src={darkMode ? websiteinactive :websiteactive} /></a> : <Image className="w-[40px]" alt="light connected world" src={darkMode ? websiteactive : websiteinactive} />}
-                {user.twitter ? <a className="w-[40px]" target="_new" href={`https://twitter.com/${user.twitter}`}><Image alt="dark twitter logo" src={darkMode ? twitterinactive :twitteractive} /></a> : <Image className="w-[40px]" alt="light twitter logo" src={darkMode ? twitteractive : twitterinactive} />}
+                {user.twitter ? <a className="w-[40px]" target="_new" href={`https://x.com/${user.twitter.replace(regex, '')}`}><Image alt="dark twitter logo" src={darkMode ? twitterinactive :twitteractive} /></a> : <Image className="w-[40px]" alt="light twitter logo" src={darkMode ? twitteractive : twitterinactive} />}
                 {user.email ? <a className="w-[40px]" href={`mailto:${user.email}`}><Image alt="dark envelope" src={darkMode ? emailinactive : emailactive} /></a> : <Image className="w-[40px]" alt="light envelope" src={darkMode ? emailactive : emailinactive} />}
                 <Image className="w-[40px]" alt="a qr code" src={darkMode ? qrdark : qricon} onClick={_ => setQrVis(!qrVis) } />
             </div>

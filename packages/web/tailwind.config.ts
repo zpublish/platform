@@ -72,6 +72,9 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: '0' },
         },
+        pulse: {
+          '50%': { opacity: '0.8' },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

@@ -1,3 +1,4 @@
+'use client'
 // import Link from "next/link"
 
 // import { env } from "@/env.mjs"
@@ -21,6 +22,8 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 // import Feed from "./feed";
 import ZaddrCard from "@/components/user/ZaddrCard";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import getUsers from "./actions";
 
 
 // async function getGitHubStars(): Promise<string | null> {
@@ -52,44 +55,68 @@ import ZaddrCard from "@/components/user/ZaddrCard";
 
 const tileWidth = 246;
 
-export default async function IndexPage() {
-  const users = [{
-        "id": 1,
-        "username": "bigben",
-        "zaddr": null,
-        "proofposturl": null,
-        "website": null,
-        "twitter": null,
-        "description": null,
-        "email": null
+type UserQuery = {}
+
+const useDirectory = (query?: UserQuery) =>
+  useInfiniteQuery({
+    queryKey: ["users"/*, query*/],
+    queryFn: async ({ pageParam = 1 }: { pageParam: number }) => {
+      const isDev = false;
+      // const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
+      // const res = await fetch(url);
+      // const data = await res.json();
+      // const data = zecPagesData;
+      const data = await getUsers({ pageParam, limit: 20 });
+      if (!data.hasMore) {
+        throw new Error('No more results')
+      }
+
+      return {
+        results: data.users,
+        nextCursor: data.nextCursor,
+        totalPages: data.totalPages,
+      };
     },
-    {
-        "id": 2,
-        "username": "michaelharms70",
-        "zaddr": "zs1pgwafaxn5jphrnvvacxr9xty9tpfn94k5um42najdy5mua69camd9edw7dqsz2qeuwvsqhyum0c",
-        "proofposturl": "https://github.com/michaelharms6010/zecpages/issues/11",
-        "website": null,
-        "twitter": "michaelharms70",
-        "description": "ZECpages creator. Chill dude.",
-        "email": null
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      // console.log('lastPage.nextCursor', lastPage.nextCursor);
+      return lastPage.nextCursor && (lastPage.nextCursor < lastPage.totalPages) ? lastPage.nextCursor : undefined;
+      // return (lastPage.nextCursor || lastPage.length > 0) ?? undefined;
     },
-    {
-        "id": 3,
-        "username": "zcashvr",
-        "zaddr": "zs1jg237ugl980vs74dleral5jnczvzprjcmnxn5gcvqg8vswhldetdwadjvxmh8nrd2wq5ql3pwxn",
-        "proofposturl": "https://twitter.com/ZcashVR",
-        "website": "z2z.to/zcashvr/?referrer=zcashvr",
-        "twitter": "ZcashVR",
-        "description": "🦓 A cypherpunk is any individual advocating widespread use of strong cryptography and privacy-enhancing technologies as a route to social and political change. 🛡️ Subscribe to my newsletter to learn new ways to protect our good ol' privacy",
-        "email": null,
-    },];
+    refetchOnWindowFocus: false,
+  });
+
+export default function IndexPage() {
+  const {
+    status,
+    data,
+    error,
+    isFetching,
+    isFetchingNextPage,
+    isRefetching,
+    isFetchingPreviousPage,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+  } = useDirectory();
+
+  const results = (data?.pages.map(page => page.results).flat() || []);
+
+  const rowCount = hasNextPage ? results.length + 1 : results.length;
+  const loadMoreRows = isFetchingNextPage
+    ? () => {}
+    : async ({ startIndex, stopIndex }: { startIndex: number, stopIndex: number }) => fetchNextPage();
+  const isRowLoaded = ({ index }: { index: number }) => {
+    return !hasNextPage || !!results[index] || index < results.length;
+  }
 
   return (
     <>
       <section className="space-y-6 pb-8 pt-6 md:pb-4 md:pt-12">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
           <Text as="h1" className="font-mono font-bold text-black text-2xl sm:text-5xl md:text-5xl mb-6 dark:text-primary">
-            ZECPages Archive
+            ZECpages Users Archive
           </Text>
           {/* <CreatePost /> */}
         </div>
@@ -105,9 +132,34 @@ export default async function IndexPage() {
       <section id="post-feed" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10">
         <div className="container max-w-[64rem] flex flex-col gap-1">
           {/* <Feed /> */}
-          {users.map((user) => (
+          {/* {users.map((user) => (
             <ZaddrCard key={user.id} user={user} />
-          ))}
+          ))} */}
+          <FlatList
+            data={results}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            isRefetching={isRefetching}
+            isFetching={isFetching}
+            fetchNextPage={fetchNextPage}
+            onEndReached={async (res: { startIndex: number, stopIndex: number }) => {
+              await loadMoreRows(res);
+            }}
+            renderItem={({ item, index }: { item: any, index: number }) => {
+              const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item;
+              const isLoaded = isRowLoaded({ index });
+
+              return isLoaded ? (
+                <div className="my-2">
+                  <ZaddrCard key={item.id} user={item} />
+                </div>
+              ) : (
+                <VStack>
+                  <Text>Loading...</Text>
+                </VStack>
+              );
+            }}
+          />
         </div>
         <div className="container flex max-w-[64rem] flex-col items-center gap-4">
           <div className="flex flex-1 w-full">

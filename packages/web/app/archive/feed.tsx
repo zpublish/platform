@@ -7,13 +7,14 @@ import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 
 import FlatList from "@/components/FlatList";
 import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ZecPostFeedItem from '@/components/social/ZecPostFeedItem';
 import { VStack } from '@/components/ui/vstack';
 import { Text } from '@/components/ui/text';
 import { HStack } from '@/components/ui/hstack';
 import getPosts from './actions';
 import Link from 'next/link';
+import { getReplies } from './z/[id]/actions';
 
 const cache = new CellMeasurerCache({
   defaultHeight: 50,
@@ -76,18 +77,44 @@ export default function Feed(props: FeedProps) {
     hasPreviousPage,
   } = useBoards();
   const { state: zecPagesState, addReply } = useZecPages();
+  const [repliesBeingFetched, setRepliesBeingFetched] = useState<{ [key: string]: boolean }>({});
   
   const results = (data?.pages.map(page => page.results).flat() || []);
   // console.log({ results })
   useEffect(() => {
-    if (addReply) {
-      results.forEach((result) => {
-        if (result.reply_to_post && !zecPagesState[result.reply_to_post]) {
-          // console.log('reply', { result })
-          addReply(result as unknown as ReplyValue);
+    const fetchReplies = async () => {
+      if (addReply) {
+        for (const result of results) {
+          if (result.reply_count > 0 && !zecPagesState[result.id]) {
+            const replies = results.filter(({ reply_to_post }) => reply_to_post === result.id);
+            if (replies.length < result.reply_count) {
+              const allReplies = await getReplies({ id: result.id });
+              if (allReplies.length === 0) {
+                addReply({ reply_to_post: result.id, id: "" } as any);
+              } else {
+                for (const reply of allReplies) {
+                  addReply(reply);
+                }
+              }
+            } else {
+              for (const reply of replies) {
+                addReply(reply);
+              }
+            }
+          }
+          // if (result.reply_to_post) {
+          //   if (!zecPagesState[result.reply_to_post]) {
+          //     // addReply(result as unknown as ReplyValue);
+          //   } else if (!repliesBeingFetched[result.reply_to_post]) {
+          //     const replies = await getReplies({ id: result.reply_to_post });
+          //     setRepliesBeingFetched({ ...repliesBeingFetched, [result.reply_to_post]: true });
+          //     console.log(result.reply_to_post, { replies });
+          //   }
+          // }
         }
-      });
+      }
     }
+    fetchReplies();
   }, [results, addReply])
 
   const rowCount = hasNextPage ? results.length + 1 : results.length;
@@ -107,6 +134,8 @@ export default function Feed(props: FeedProps) {
       hasNextPage={hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       isRefetching={isRefetching}
+      fetchNextPage={fetchNextPage}
+      isFetching={isFetching}
       onEndReached={async (res: { startIndex: number, stopIndex: number }) => {
         await loadMoreRows(res);
       }}
@@ -155,61 +184,61 @@ export default function Feed(props: FeedProps) {
               // }}
               // bg="#E9F7F9"
             />
-            {replyCount > 0 && zecPagesState?.[id] && Object.keys(zecPagesState[id]).slice(0,2).map((k, i) => {
-              const replyPost = zecPagesState[id][k];
-              let _replyCount = Number(replyCount);
-              const textContent = replyPost.memo?.replace(/^REPLY::\w+ /, '').trim();
+            {replyCount > 0 && (
+              <div className="ml-10">
+                {zecPagesState?.[id] ? Object.keys(zecPagesState[id]).slice(0,2).map((k, i) => {
+                  const replyPost = zecPagesState[id][k];
+                  let _replyCount = Number(replyCount);
+                  const textContent = replyPost.memo?.replace(/^REPLY::\w+ /, '').trim();
 
-              return !!textContent && (
-                <div className="ml-10">
-                  {_replyCount > 3 && i === 0 && (
-                    <VStack>
-                      <VStack className="bg-black dark:bg-[#00FF7F] w-[1px] h-8" />
-                      <HStack className="my-2">
-                        <a href={`https://zecpublish.com/archive/z/${id}/`} target="_blank" rel="noopener noreferrer">
-                          <Text className="text-blue-500 font-sans underline">See all replies</Text>
-                        </a>
-                      </HStack>
-                      <VStack className="bg-black dark:bg-[#00FF7F] w-[1px] h-8" />
-                    </VStack>
-                  )}
+                  return !!textContent && (
+                    <div className="ml-10">
+                      {_replyCount > 3 && i === 0 && (
+                        <VStack>
+                          <VStack className="bg-black dark:bg-[#00FF7F] w-[1px] h-8" />
+                          <HStack className="my-2">
+                            <a href={`https://zecpublish.com/archive/z/${id}/`} target="_blank" rel="noopener noreferrer">
+                              <Text className="text-blue-500 font-sans underline">See all replies</Text>
+                            </a>
+                          </HStack>
+                          <VStack className="bg-black dark:bg-[#00FF7F] w-[1px] h-8" />
+                        </VStack>
+                      )}
+                      <ZecPostFeedItem
+                        createdAt={new Date(Number(replyPost?.datetime))}
+                        replyToPostId={id}
+                        text={textContent}
+                        replyCount={i === 0 ? _replyCount : 0}
+                        likeCount={likes}
+                        id={replyPost.id}
+                        onPressLike={() => {}}
+                        onPressReply={() => {}}
+                      />
+                    </div>
+                  )
+                }) : (
                   <ZecPostFeedItem
-                    // textContent={textContent}
-                    // // @ts-expect-error 123
-                    createdAt={new Date(Number(replyPost?.datetime))}
-                    replyToPostId={id}
-                    text={textContent}
-                    replyCount={i === 0 ? _replyCount : 0}
-                    likeCount={likes}
-                    id={replyPost.id}
-                    // mt={0}
-                    // mb={16}
-                    onPressLike={() => {}}
-                    onPressReply={() => {}}
-                    // onPressLike={() => {
-                    //   setModalState({
-                    //     ...modalState,
-                    //     isOpen: true,
-                    //     memo: encodeMemo(`LIKE::${id}`),
-                    //     type: 'like_post'
-                    //   });
-                    // }}
-                    // onPressReply={() => {
-                    //   setModalState({
-                    //     isOpen: true,
-                    //     type: 'reply_post',
-                    //     post: replyPost
-                    //   })
-                    // }}
-                    // bg="#E9F7F9"
+                    isLoading
+                    isReply
+                    replyCount={1}
                   />
-                </div>
-              )
-            })}
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <VStack>
-            <Text>Loading...</Text>
+            <ZecPostFeedItem
+              isLoading
+              createdAt={new Date()}
+              replyToPostId={undefined}
+              text=""
+              replyCount={0}
+              likeCount={0}
+              id={0}
+              amount={0}
+              txid=""
+            />
           </VStack>
         );
       }}

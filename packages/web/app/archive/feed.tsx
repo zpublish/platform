@@ -125,7 +125,7 @@ export default function Feed(props: FeedProps) {
 
         return isLoaded && datetime && !reply_to_post ? (
           <div className="my-2">
-            <ZecPostFeedItem
+            <ZecPostFeedItem // @ts-ignore
               key={`id-${item?.id}` || `index-${index}`}
               createdAt={new Date(Number(datetime))}
               replyToPostId={reply_to_post}

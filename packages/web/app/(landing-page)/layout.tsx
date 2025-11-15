@@ -16,7 +16,7 @@ export default async function MarketingLayout({
 }: MarketingLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="z-40 bg-black dark:bg-white dark:bg-gradient">
+      <header className="z-40 bg-gradient-dark dark:bg-gradient">
         <div className="container">
           <div className="flex h-20 items-center justify-between py-6">
             <MainNav items={marketingConfig.mainNav} />
@@ -25,7 +25,7 @@ export default async function MarketingLayout({
                 href="/login"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "px-4 dark:text-black dark:border dark:border-black dark:hover:text-white"
+                  "px-4 text-white dark:text-black border border-white dark:border-black dark:hover:text-white"
                 )}
               >
                 LOGIN
@@ -34,7 +34,7 @@ export default async function MarketingLayout({
                 href="/signup"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "px-4 dark:text-black dark:border dark:border-black dark:hover:text-white"
+                  "px-4 text-white dark:text-black border border-white dark:border-black dark:hover:text-white"
                 )}
               >
                 SIGN UP

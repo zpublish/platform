@@ -2,6 +2,8 @@ import {
   AlertTriangle,
   ArrowRight,
   Check,
+  Globe,
+  Mail,
   ChevronLeft,
   ChevronRight,
   Command,
@@ -125,4 +127,6 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
+  globe: Globe,
+  mail: Mail,
 }

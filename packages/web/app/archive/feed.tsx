@@ -140,7 +140,7 @@ export default function Feed(props: FeedProps) {
         await loadMoreRows(res);
       }}
       renderItem={({ item, index }: { item: Board, index: number }) => {
-        const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item;
+        const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item || {};
         const isLoaded = isRowLoaded({ index });
 
         // Line

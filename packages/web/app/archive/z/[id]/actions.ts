@@ -21,6 +21,10 @@ async function findPost(db: Low<Data>, _txid: string) {
     expiration,// @ts-ignore
   }) => ((txid === _txid) || (id === Number(_txid))))
 
+  if (!post) {
+    return null;
+  }
+
   // console.log({ post })
 
   const { // @ts-ignore

@@ -13,6 +13,7 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 // import { useRouter } from "next/navigation";
 import getPost, { getReplies } from "./actions";
+import { permanentRedirect } from "next/navigation";
 // import Feed from "./feed";
 
 
@@ -46,14 +47,15 @@ import getPost, { getReplies } from "./actions";
 const tileWidth = 246;
 
 export default async function IndexPage({ params, searchParams }: { params: { id: string }, searchParams: {} }) {
-  // const router = useRouter();
-  // const { id } = router.query;
   const post = await getPost({ txid: params.id as string });
+  if (post?.txid && !Number.isNaN(Number(params.id)) && Number(params.id) > 0 && Number(params.id) < 5000) {
+    permanentRedirect(`/archive/z/${post.txid}`);
+    return null;
+  }
   let replies;
 
-  if (post.reply_count > 0) {
-    replies = await getReplies({ id: post.id as number });
-    // setReplies(replies)
+  if (post?.reply_count > 0) {
+    replies = await getReplies({ id: post?.id as number });
   }
   // useEffect(() => {
   //   async function fetchReplies() {
@@ -62,7 +64,7 @@ export default async function IndexPage({ params, searchParams }: { params: { id
   // }, [post.reply_count]);
 
 
-  return (
+  return !post ? null : (
     <>
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">

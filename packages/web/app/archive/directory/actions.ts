@@ -18,7 +18,7 @@ async function getPaginatedUsers(db: Low<Data>, page = 1, limit = 10) {
 
 
   // Get the users from the db
-  const users = db.data.users.reverse().slice(startIndex, endIndex).map(({ // @ts-ignore
+  const users = db.data.users.slice(startIndex, endIndex).map(({ // @ts-ignore
     id,
     username,
     zaddr,

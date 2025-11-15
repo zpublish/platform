@@ -146,17 +146,17 @@ export default function IndexPage() {
               await loadMoreRows(res);
             }}
             renderItem={({ item, index }: { item: any, index: number }) => {
-              const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item;
+              // const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item || {};
               const isLoaded = isRowLoaded({ index });
 
-              return isLoaded ? (
+              return (isLoaded && item?.id) ? (
                 <div className="my-2">
                   <ZaddrCard key={item.id} user={item} />
                 </div>
               ) : (
-                <VStack>
-                  <Text>Loading...</Text>
-                </VStack>
+                <div className="my-2">
+                  <ZaddrCard key={`index-${index}`} isLoading />
+                </div>
               );
             }}
           />

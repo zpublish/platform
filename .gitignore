@@ -107,8 +107,9 @@ dist
 *.env
 .DS_Store
 
-public/
 public2/
+db.json
+db2.json
 packages/design/data/
 redis.conf
 packages/api/data/zecpages/

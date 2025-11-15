@@ -134,7 +134,7 @@ const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, h
         </div>
       )}
       <div>
-        {isFetching && !isFetchingNextPage ? 'Background Updating...' : null}
+        {isFetching && !isFetchingNextPage ? renderItem({ item: null, index: 0 }) : null}
       </div>
       <br />
       <br />

@@ -31,7 +31,9 @@ const hstackVariants = cva(
         bottom: 'items-end',
       },
       justify: {
-        between: 'justify-between'
+        top: 'justify-top',
+        between: 'justify-between',
+        bottom: 'justify-end',
       },
       flex: {
         1: 'flex-1',

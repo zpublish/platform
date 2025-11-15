@@ -39,7 +39,7 @@
 
     /* custom */
     --gradient: linear-gradient(to top left,#00F5A0,#00D9F5);
-    --gradient-dark: linear-gradient(to top left,#c8cae4, #aae4ff);
+    --gradient-dark: linear-gradient(to top left,#002329, #001a24);
   }
 
   .dark {
@@ -84,7 +84,4 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-
-  .bg-gradient { background: var(--gradient) }
-  .bg-gradient-dark { background: var(--gradient-dark) }
 }

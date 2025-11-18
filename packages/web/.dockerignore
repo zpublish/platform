@@ -1,0 +1,6 @@
+data/db.json
+data/db2.json
+db/zecpublish.db
+node_modules
+zec-wallet2.db
+zec-wallet.db

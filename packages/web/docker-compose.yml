@@ -1,13 +1,38 @@
 version: '3'
 services:
+  zcash_walletd:
+    restart: unless-stopped
+    image: hhanh00/zcash-walletd:1.1.4
+    environment:
+      LWD_URL: https://zec.rocks:443
+      ROCKET_DB_PATH: /data/zec-wallet2.db
+      CONFIG_PATH: /data/config2.json
+      NOTIFY_TX_URL: http://nextapp:3000/zcashlikedaemoncallback/tx?cryptoCode=zec&hash=
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - generated_default
+    volumes:
+    - "./wallet_datadir:/data"
+  # postgres:
+  #   image: postgres:13.4
+  #   environment:
+  #       POSTGRES_HOST_AUTH_METHOD: trust
+  #   ports:
+  #     - "39372:5432"
+  #   expose:
+  #     - "5432"
   nextapp:
     build:
        context: .
        dockerfile: Dockerfile
     volumes:
       - ./data/db.json:/app/data/db.json:ro
+      - ./db/:/app/db/
     networks:
       - generated_default
+    environment:
+      ZEC_WALLET_DAEMON_URI: http://zcash_walletd:8000
 
 networks:
   generated_default:

@@ -113,3 +113,5 @@ db2.json
 packages/design/data/
 redis.conf
 packages/api/data/zecpages/
+zec-wallet2.db
+zec-wallet.db

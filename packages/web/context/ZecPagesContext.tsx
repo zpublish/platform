@@ -5,7 +5,7 @@ enum ActionTypes {
 };
 
 export type ReplyValue = {
-  id: string,
+  id: number,
   memo: string,
   reply_to_post?: string,
   datetime?: string,

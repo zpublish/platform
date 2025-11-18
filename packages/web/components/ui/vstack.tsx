@@ -26,7 +26,7 @@ const vstackVariants = cva(
       },
     },
     defaultVariants: {
-      alignment: 'center'
+      // alignment: 'center'
     },
   }
 );

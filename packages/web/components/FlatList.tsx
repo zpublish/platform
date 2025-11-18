@@ -73,7 +73,7 @@ const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, h
   return (
     <div>
       {status === 'pending' ? (
-        <p>Loading...</p>
+        renderItem({ item: null, index: 0 })
       ) : status === 'error' ? (
         <></>
       ) : (
@@ -120,7 +120,7 @@ const FlatList = ({ onEndReached, isFetching, fetchNextPage, data, renderItem, h
                 >
                   {isLoaderRow
                     ? hasNextPage
-                      ? 'Loading more...'
+                      ? renderItem({ item: null, index: 0 })
                       : 'Nothing more to load'
                     : (
                       <div>

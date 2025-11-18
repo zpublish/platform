@@ -45,7 +45,7 @@ const hstackVariants = cva(
       },
     },
     defaultVariants: {
-      alignment: 'center',
+      // alignment: 'center',
     },
   }
 );

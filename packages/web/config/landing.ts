@@ -3,12 +3,12 @@
 export const marketingConfig = {
   mainNav: [
     {
-      title: "Archive",
-      href: "/archive",
+      title: "ZECpages Archive",
+      href: "/a",
     },
     {
-      title: "Old Users",
-      href: "/archive/directory",
+      title: "Archived Users",
+      href: "/au",
     },
     // {
     //   title: "Users",

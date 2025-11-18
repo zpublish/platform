@@ -15,7 +15,7 @@ import { HStack } from "./ui/hstack";
 
 
 const tileWidth = 246;
-const addr = "u1rl2zw85...";
+const addr = "u1mpqagwcatyxa6q5pkpvgmpv4swf6hs9qyq67f7qy4e6vwq6ev9samuy23qncymyva3ykuhwk2kk9p7a0avsnp20r4c0lky76q0yjdt3c5857h6vkeje9gzlqzzv96tmhfzy66wa6r4zuqhryc53rkhuu2h9dal0f8hvvdqvnwql06nj08xq4m3wmpr5mvnmxqeu9a6499aerjhk4efj";
 
 
 export default function CreatePost({ ...props }) {
@@ -57,13 +57,13 @@ export default function CreatePost({ ...props }) {
           <>
             {[{ bg: 'white', linearGradient: ['#00F5A0', '#00D9F5'], stroke: 'transparent', borderColor: 'black', borderWidth: '4px' }].map(({ bg, linearGradient, stroke, borderColor, borderWidth }) => (
               // <VStack className="mx-2 mb-4 items-center" alignment="center" style={{ background: bg, padding: 20, borderRadius: '4px' }}>
-              <VStack className="mb-4 bg-gray-950 border-2 border-[#00FF7F] w-full max-w-md pt-8 pb-10 relative">
+              <VStack alignment="center" className="mb-4 bg-gray-950 border-2 border-[#00FF7F] w-full max-w-md pt-8 pb-10 relative">
                 <div className="absolute top-4 right-4">
                   <Icons.close color="white" onClick={() => setStep(0)} />
                 </div>
                 <Text className="mb-4 text-xl text-white leading-[24px] md:text-2xl lg:md:text-3xl" font="mono">
                   Send
-                  <Text className="text-primary mx-4">0.01 ZEC</Text>
+                  <Text className="text-primary mx-4">0.001 ZEC</Text>
                   to
                 </Text>
                 <QRCode
@@ -73,7 +73,7 @@ export default function CreatePost({ ...props }) {
                   color={stroke}
                   includeMargin={true}
                   size={Math.min(Math.round(((dimensions.width || 48) - 48)), 348) || tileWidth}
-                  value={`zcash:${0}?amount=0.001&memo=${0}`}
+                  value={`zcash:${addr}?amount=0.001&memo=${0}`}
                   logoBackgroundColor="bg-gray-900"
                   logoBorderRadius={0}
                   logoMargin={8}

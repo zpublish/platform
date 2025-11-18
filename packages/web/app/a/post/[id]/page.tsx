@@ -49,7 +49,7 @@ const tileWidth = 246;
 export default async function IndexPage({ params, searchParams }: { params: { id: string }, searchParams: {} }) {
   const post = await getPost({ txid: params.id as string });
   if (post?.txid && !Number.isNaN(Number(params.id)) && Number(params.id) > 0 && Number(params.id) < 5000) {
-    permanentRedirect(`/archive/z/${post.txid}`);
+    permanentRedirect(`/a/post/${post.txid}`);
     return null;
   }
   let replies;
@@ -92,6 +92,7 @@ export default async function IndexPage({ params, searchParams }: { params: { id
             replyCount={post.reply_count ? post.reply_count : 0}
             likeCount={post.likes}
             id={post.id}
+            txid={post.txid}
             amount={post.amount}
             // mb={16}
             onPressLike={null as any}
@@ -108,6 +109,7 @@ export default async function IndexPage({ params, searchParams }: { params: { id
                       replyCount={post.reply_count ? post.reply_count : 0}
                       likeCount={_post.likes}
                       id={_post.id}
+                      txid={_post.id}
                       amount={_post.amount}
                       // mb={16}
                       onPressLike={null as any}

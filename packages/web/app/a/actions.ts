@@ -1,9 +1,9 @@
 'use server'
 // import { FETCH_POSTS_LIMIT } from "./constants";
 import { Low } from 'lowdb';
-import { getDb, Data } from '@/data';
+import { getDb, Data } from '@/data/json';
 
-async function getPaginatedPosts(db: Low<Data>, page = 1, limit = 10) {
+async function getPaginatedPosts(db: Low<Data>, page = 1, limit = 10, boardName?: string) {
   // Ensure the page number is valid
   page = page > 0 ? page : 1;
   limit = limit > 0 ? limit : 10;
@@ -49,7 +49,7 @@ async function getPaginatedPosts(db: Low<Data>, page = 1, limit = 10) {
     "board_name": board_name,
     "board_zaddr": board_zaddr,
     "username": null,
-  })).filter((n: any) => n.id);
+  })).filter((n: any) => (n.id && (boardName ? n.board_name === boardName : true)));
 
   // Check if there are more posts
   const hasMore = db.data.posts.length > endIndex;
@@ -67,15 +67,17 @@ async function getPaginatedPosts(db: Low<Data>, page = 1, limit = 10) {
 export default async function getPosts({
   pageParam = 1,
   limit = 20,
+  boardName,
 }: {
   pageParam: number;
   limit: number;
+  boardName?: string;
 }) {
 
   const db = await getDb();
   await db.read();
 
-  const posts = await getPaginatedPosts(db, pageParam, limit)
+  const posts = await getPaginatedPosts(db, pageParam, limit, boardName);
 
   return posts;
 }

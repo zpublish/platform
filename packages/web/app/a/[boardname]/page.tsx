@@ -1,3 +1,4 @@
+'use client'
 // import Link from "next/link"
 
 // import { env } from "@/env.mjs"
@@ -15,17 +16,63 @@ import { Text } from "@/components/ui/text"
 
 import zecPagesData from '@zpublish/components/data/zecpages_feed.json';
 import FlatList from '@/components/FlatList';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
-import Feed from "./feed";
+import Feed from "../feed";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 
 const tileWidth = 246;
 
-export default async function IndexPage() {
-  
+export default function IndexPage({ params, searchParams }: { params: { boardname: string }, searchParams: {} }) {
+  const router = useRouter();
+  const board_names = [
+    'featurerequests',
+    'mozfest',
+    'confessjam',
+    'wsb',
+    'zomg',
+    'fortunetellers',
+    'watercooler',
+    'anime',
+    'cryptohistory',
+    'zcash_es',
+    'secretadmirer',
+    'listento',
+    'flowers',
+    'dreams',
+    'occultism',
+    'zf',
+    'localzcash',
+    'pos',
+    'grateful',
+    'take_it_easy',
+    'supportrequests',
+    'zchat',
+    'donaldwon',
+    'usersfirst',
+    'just_the_best',
+    'bog_calls',
+    'mining',
+    'good_ideas',
+    'cryptoincontext',
+    'rapcipher',
+    'zcashu',
+    'the_river',
+    'zcg',
+    'zuu',
+    'zcash_community',
+    'kawaiizcash',
+    'zcashbrasil',
+    'who_is_the_most_beautiful',
+    'token_zcash',
+  ];
 
   return (
     <>
@@ -47,7 +94,24 @@ export default async function IndexPage() {
       </section>
       <section id="post-feed" className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10">
         <div className="container max-w-[64rem]">
-          <Feed />
+          <HStack className="w-full gap-2">
+            {/* <Input placeholder="Search" className="w-auto" /> */}
+            <NativeSelect value={params.boardname} onChange={e => router.push(`/a/${e.target.value}`)}>
+              <NativeSelectOption value="">z/all</NativeSelectOption>
+              {board_names.map((board_name) => (
+                <NativeSelectOption value={board_name}>{`z/${board_name}`}</NativeSelectOption>
+              ))}
+            </NativeSelect>
+            {/* <HStack alignment="center" className="gap-3 justify-self-end">
+              <Checkbox
+                id="toggleReplies"
+                defaultChecked
+                className="data-[state=checked]:border-white h-4 w-4 text-lg data-[state=checked]:bg-white data-[state=checked]:text-blue-600 dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
+              />
+              <Label className="text-black" htmlFor="toggleReplies">Toggle Replies</Label>
+            </HStack> */}
+          </HStack>
+          <Feed boardname={params.boardname} />
         </div>
         <div className="container flex max-w-[64rem] flex-col items-center gap-4">
           <div className="flex flex-1 w-full">

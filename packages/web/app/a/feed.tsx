@@ -14,14 +14,16 @@ import { Text } from '@/components/ui/text';
 import { HStack } from '@/components/ui/hstack';
 import getPosts from './actions';
 import Link from 'next/link';
-import { getReplies } from './z/[id]/actions';
+import { getReplies } from './post/[id]/actions';
 
 const cache = new CellMeasurerCache({
   defaultHeight: 50,
   fixedWidth: true
 });
 
-type FeedProps = {}
+type FeedProps = {
+  boardname?: string;
+}
 
 type BoardFeedItem = typeof zecPagesData[0];
 
@@ -29,20 +31,24 @@ type Board = BoardFeedItem & {
   id: number;
   name: string;
   reply_to_post: string | undefined;
+  board_name?: string;
 }
 
-type BoardQuery = {}
+type BoardQuery = {
+  boardname?: string,
+}
 
 const useBoards = (query?: BoardQuery) =>
   useInfiniteQuery({
-    queryKey: ["board"/*, query*/],
+    queryKey: ["board", query],
     queryFn: async ({ pageParam = 1 }: { pageParam: number }) => {
       const isDev = false;
       // const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;
       // const res = await fetch(url);
       // const data = await res.json();
       // const data = zecPagesData;
-      const data = await getPosts({ pageParam, limit: 20 });
+      const { boardname } = query || {};
+      const data = await getPosts({ pageParam, limit: 20, boardName: boardname });
       if (!data.hasMore) {
         throw new Error('No more results')
       }
@@ -75,7 +81,9 @@ export default function Feed(props: FeedProps) {
     fetchPreviousPage,
     hasNextPage,
     hasPreviousPage,
-  } = useBoards();
+  } = useBoards({
+    boardname: props.boardname,
+  });
   const { state: zecPagesState, addReply } = useZecPages();
   const [repliesBeingFetched, setRepliesBeingFetched] = useState<{ [key: string]: boolean }>({});
   
@@ -140,7 +148,7 @@ export default function Feed(props: FeedProps) {
         await loadMoreRows(res);
       }}
       renderItem={({ item, index }: { item: Board, index: number }) => {
-        const { datetime, memo, txid, reply_to_post, reply_count: replyCount, id, likes, amount } = item || {};
+        const { datetime, memo, txid, reply_to_post, board_name, reply_count: replyCount, id, likes, amount } = item || {};
         const isLoaded = isRowLoaded({ index });
 
         // Line
@@ -148,9 +156,9 @@ export default function Feed(props: FeedProps) {
         // Line
 
         if (reply_to_post) { return null; }
-        if (replyCount > 0) {
-          console.log(replyCount > 0 && zecPagesState?.[id] && Object.keys(zecPagesState[id]).slice(0,2))
-        }
+        // if (replyCount > 0) {
+        //   console.log(replyCount > 0 && zecPagesState?.[id] && Object.keys(zecPagesState[id]).slice(0,2))
+        // }
 
         return isLoaded && datetime && !reply_to_post ? (
           <div className="my-2">
@@ -163,6 +171,7 @@ export default function Feed(props: FeedProps) {
               likeCount={likes}
               id={id}
               amount={amount}
+              boardName={!props.boardname ? board_name : undefined}
               txid={txid}
               // mb={16}
               onPressLike={() => {}}
@@ -197,7 +206,7 @@ export default function Feed(props: FeedProps) {
                         <VStack>
                           <VStack className="bg-black dark:bg-[#00FF7F] w-[1px] h-8" />
                           <HStack className="my-2">
-                            <a href={`https://zecpublish.com/archive/z/${id}/`} target="_blank" rel="noopener noreferrer">
+                            <a href={`https://zecpublish.com/a/post/${id}/`} target="_blank" rel="noopener noreferrer">
                               <Text className="text-blue-500 font-sans underline">See all replies</Text>
                             </a>
                           </HStack>

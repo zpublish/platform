@@ -1,7 +1,7 @@
 'use server'
 // import { FETCH_POSTS_LIMIT } from "./constants";
 import { Low } from 'lowdb';
-import { getDb, Data } from '@/data';
+import { getDb, Data } from '@/data/json';
 
 async function getPaginatedUsers(db: Low<Data>, page = 1, limit = 10) {
   // Ensure the page number is valid

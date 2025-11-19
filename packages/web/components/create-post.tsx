@@ -15,17 +15,66 @@ import { HStack } from "./ui/hstack";
 
 
 const tileWidth = 246;
-const addr = "u1mpqagwcatyxa6q5pkpvgmpv4swf6hs9qyq67f7qy4e6vwq6ev9samuy23qncymyva3ykuhwk2kk9p7a0avsnp20r4c0lky76q0yjdt3c5857h6vkeje9gzlqzzv96tmhfzy66wa6r4zuqhryc53rkhuu2h9dal0f8hvvdqvnwql06nj08xq4m3wmpr5mvnmxqeu9a6499aerjhk4efj";
+const zaddr = "u1mpqagwcatyxa6q5pkpvgmpv4swf6hs9qyq67f7qy4e6vwq6ev9samuy23qncymyva3ykuhwk2kk9p7a0avsnp20r4c0lky76q0yjdt3c5857h6vkeje9gzlqzzv96tmhfzy66wa6r4zuqhryc53rkhuu2h9dal0f8hvvdqvnwql06nj08xq4m3wmpr5mvnmxqeu9a6499aerjhk4efj";
 
+const byteSize = (str: string) => new Blob([str]).size;
+
+function memoToBytes(str: string): Uint8Array {
+  return new TextEncoder().encode(str); // no padding
+}
+
+// 2️⃣ Convert bytes to Base64
+function bytesToBase64(bytes: Uint8Array): string {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(bytes).toString("base64");
+  }
+  let binary = "";
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function encodeMemoForUri(str: string): string {
+  const bytes = memoToBytes(str);
+  const base64 = bytesToBase64(bytes);
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 export default function CreatePost({ ...props }) {
+  const [memo, setMemo] = useState('');
   const [step, setStep] = useState(0);
+  const [error, setError] = useState('');
   // const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const elementRef = useRef<HTMLDivElement>(null);
   const dimensions = useResizeObserver({
     ref: elementRef,
     box: 'border-box',
   });
+  const amount = '0.001';
+  
+
+  const encodedMemo = encodeMemoForUri(memo);
+
+  // const encodedMemo = toBase64(memo).replace('=', '');
+  const zcashAddr = `zcash:${zaddr}?amount=${amount}&memo=${encodedMemo}`;
+
+  const isPoll = false;
+  const pollBuilder = {};
+  // const encodedMemo = 
+  //   isPoll ? toBase64("POLL::" + JSON.stringify(pollBuilder))
+  //   : `${toBase64(`${boardName ? `BOARD::${boardName} ` : boardInput ? `BOARD::${boardInput} ` : ""}${isReply ? `REPLY::${post.id} ` : ""}${replyBody}`)}`
+
+  useEffect(() => {
+    if (byteSize(encodedMemo) >= 512) {
+      setError('Zcash memos are capped to 512 bytes, please shorten your post.');
+    // } else if (memo?.length > 280) {
+    //   setError('Tweets are limited to 280 characters, please shorten your post.');
+    } else {
+      setError('');
+    }
+  }, [byteSize, encodedMemo]);
 
   // const elementRef = useResizeObserver(onResize);
 
@@ -35,11 +84,19 @@ export default function CreatePost({ ...props }) {
       {{
         [0]: (
           <>
-      <Textarea className="min-h-32 dark:bg-background text-black dark:text-white dark:border-2 dark:border-white" placeholder="Write your post here…" />
+            <Textarea
+              className="min-h-32 dark:bg-background text-black dark:text-white dark:border-2 dark:border-white"
+              placeholder="Write your post here…"
+              value={memo}
+              onChange={e => setMemo(e.target.value)}
+            />
+            {error && (
+              <span className="text-red-500">{error}</span>
+            )}
             <div className="flex row bg-gradient-dark dark:bg-gradient w-full p-3 py-2">
               <div className="w-full">
                 <div className="text-white dark:text-black">
-                  <EllipsisBoxWrapper className="font-mono" text={addr} offset={6} />
+                  <EllipsisBoxWrapper className="font-mono" text={zaddr} offset={6} />
                 </div>
               </div>
               <Icons.miniQrCode className="ml-3 text-white dark:text-black" />
@@ -47,7 +104,7 @@ export default function CreatePost({ ...props }) {
             </div>
             <div className="flex w-full row justify-between">
               <div className="flex flex-1" />
-              <Button variant="secondary" className="text-black" onClick={() => setStep(1)}>
+              <Button variant="secondary" className="text-black" onClick={() => !error && setStep(1)} disabled={!!error}>
                 SUBMIT POST
               </Button>
             </div>
@@ -73,7 +130,7 @@ export default function CreatePost({ ...props }) {
                   color={stroke}
                   includeMargin={true}
                   size={Math.min(Math.round(((dimensions.width || 48) - 48)), 348) || tileWidth}
-                  value={`zcash:${addr}?amount=0.001&memo=${0}`}
+                  value={zcashAddr}
                   logoBackgroundColor="bg-gray-900"
                   logoBorderRadius={0}
                   logoMargin={8}
@@ -91,7 +148,7 @@ export default function CreatePost({ ...props }) {
             <div className="flex row bg-gradient-dark dark:bg-gradient w-full p-3 py-2">
               <div className="w-full">
                 <div className="text-white dark:text-black">
-                  <EllipsisBoxWrapper text={addr} offset={12} />
+                  <EllipsisBoxWrapper text={zaddr} offset={12} />
                 </div>
               </div>
               <Icons.miniQrCode className="ml-3 text-white dark:text-black" />

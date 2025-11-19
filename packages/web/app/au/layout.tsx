@@ -21,7 +21,7 @@ export default async function MarketingLayout({
           <div className="flex h-20 items-center justify-between py-6">
             <MainNav items={marketingConfig.mainNav} />
             <nav className="flex gap-2">
-              <Link
+              {/* <Link
                 href="/login"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
@@ -38,7 +38,7 @@ export default async function MarketingLayout({
                 )}
               >
                 SIGN UP
-              </Link>
+              </Link> */}
             </nav>
           </div>
         </div>

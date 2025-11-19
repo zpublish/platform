@@ -50,9 +50,12 @@ export default function IndexPage({ params, searchParams }: { params: { boardnam
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
           <Text as="h1" className="font-mono font-bold text-black text-2xl sm:text-5xl md:text-5xl mb-6 dark:text-primary">
-            ZECpublish Posts
+            ZEC-powered Anonymous Memo Board
           </Text>
-          {/* <CreatePost /> */}
+          <Text as="h2" className="font-mono font-bold text-black text-lg mb-2 dark:text-[#a0f]">
+            (experimental/alpha)
+          </Text>
+          <CreatePost />
         </div>
         {/* <HStack spacing={3} alignment="trailing" className="h-24 bg-slate-800">
           <div className="p-4 bg-primary h-12">Test</div>

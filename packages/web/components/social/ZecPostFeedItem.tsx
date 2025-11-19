@@ -58,12 +58,18 @@ const ZecPostFeedItem = ({
   }
 
   const onPressLike = () => {
+    if (isArchive) {
+      return;
+    }
     if (isReplying) {
       setIsReplying(false);
     }
     setIsLiking(!isLiking);
   };
   const onPressReply = () => {
+    if (isArchive) {
+      return;
+    }
     if (isLiking) {
       setIsLiking(false);
     }
@@ -164,8 +170,8 @@ const ZecPostFeedItem = ({
                 { component: <Icons.share size={20} className="text-black dark:text-white text-xs" />, id: 'share' },
                 // { component: LinkIcon, id: 'link' },
               ].map(({ component: Comp, id: actionId }) => {
-                const hrefById: any = {
-                  link: `https://zecpublish.com/a/post/${id}/`,
+                const hrefById = {
+                  link: isArchive ? `https://zecpublish.com/a/post/${id}/` : `https://zecpublish.com/z/post/${id}/`,
                   // reply: `https://zecpages.com/z/post/${id}/`,
                   // repost: `https://twitter.com/intent/retweet?tweet_id=${id}`,
                   // favorite: `https://twitter.com/intent/like?tweet_id=${id}`,
@@ -176,10 +182,10 @@ const ZecPostFeedItem = ({
                   <HStack
                     alignment="leading"
                     // className="mr-4"
-                    as={actionId === 'link' && 'a'}
-                    {...actionId !== 'share' && hrefById[actionId] && { href: hrefById[actionId], rel: 'noopener noreferrer', target: '_blank' }}
+                    // as={actionId === 'link' && 'a'}
+                    {...actionId !== 'share' && hrefById[actionId as 'link'] && { href: hrefById[actionId as 'link'], rel: 'noopener noreferrer', target: '_blank' }}
                     onClick={(actionId === 'share')
-                      ? () => { if (typeof nav !== 'undefined' && nav?.canShare && nav.share) { nav?.share({ url: `https://zecpublish.com/a/post/${id}/`}) } }
+                      ? () => { if (typeof nav !== 'undefined' && nav?.canShare && nav.share) { nav?.share({ url: hrefById.link }) } }
                       : (actionId === 'reply'
                         ? onPressReply
                         : undefined)

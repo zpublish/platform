@@ -54,8 +54,8 @@ export default async function IndexPage({ params, searchParams }: { params: { id
   }
   let replies;
 
-  if (post?.reply_count > 0) {
-    replies = await getReplies({ id: post?.id as number });
+  if (post?.reply_count && post.txid && (post?.reply_count > 0)) {
+    replies = await getReplies({ txid: post?.txid });
   }
   // useEffect(() => {
   //   async function fetchReplies() {
@@ -95,8 +95,6 @@ export default async function IndexPage({ params, searchParams }: { params: { id
             txid={post.txid}
             amount={post.amount}
             // mb={16}
-            onPressLike={null as any}
-            onPressReply={null as any}
           />
           {!!replies && (
                 <div className="ml-10">
@@ -112,8 +110,6 @@ export default async function IndexPage({ params, searchParams }: { params: { id
                       txid={_post.id}
                       amount={_post.amount}
                       // mb={16}
-                      onPressLike={null as any}
-                      onPressReply={null as any}
                   />
                   )))}
                 </div>

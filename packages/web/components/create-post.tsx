@@ -12,7 +12,12 @@ import { Text } from "./ui/text";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
 import { HStack } from "./ui/hstack";
 
-
+const copyTextToClipboard = async (text: string) => {
+  if (!navigator.clipboard) {
+    return;
+  }
+  return await navigator.clipboard.writeText(text);
+}
 
 const tileWidth = 246;
 const zaddr = "u1mpqagwcatyxa6q5pkpvgmpv4swf6hs9qyq67f7qy4e6vwq6ev9samuy23qncymyva3ykuhwk2kk9p7a0avsnp20r4c0lky76q0yjdt3c5857h6vkeje9gzlqzzv96tmhfzy66wa6r4zuqhryc53rkhuu2h9dal0f8hvvdqvnwql06nj08xq4m3wmpr5mvnmxqeu9a6499aerjhk4efj";
@@ -42,9 +47,14 @@ function encodeMemoForUri(str: string): string {
   return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export default function CreatePost({ ...props }) {
+export default function CreatePost({ isReply, isLiking, post, onClose, ...props }: {
+  isReply?: boolean,
+  isLiking?: boolean,
+  post?: { txid: string },
+  onClose?: () => void,
+}) {
   const [memo, setMemo] = useState('');
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(isLiking ? 1 : 0);
   const [error, setError] = useState('');
   // const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const elementRef = useRef<HTMLDivElement>(null);
@@ -53,15 +63,21 @@ export default function CreatePost({ ...props }) {
     box: 'border-box',
   });
   const amount = '0.001';
-  
+  const placeholder = isLiking ? "" : (isReply ? "Write your reply here…" : "Write your post here…")
+  const isPoll = false;
+  const pollBuilder = {};
+  const boardName = '';
 
-  const encodedMemo = encodeMemoForUri(memo);
+  const encodedMemo = encodeMemoForUri(
+    (isLiking && post) ? `LIKE::${post.txid}` : (
+      isPoll ? `POLL::${JSON.stringify(pollBuilder)}`
+      : `${boardName ? `BOARD::${boardName} ` : ''}${(isReply && post) ? `REPLY::${post.txid} ` : ""}${memo}`
+    ) 
+  );
 
   // const encodedMemo = toBase64(memo).replace('=', '');
   const zcashAddr = `zcash:${zaddr}?amount=${amount}&memo=${encodedMemo}`;
 
-  const isPoll = false;
-  const pollBuilder = {};
   // const encodedMemo = 
   //   isPoll ? toBase64("POLL::" + JSON.stringify(pollBuilder))
   //   : `${toBase64(`${boardName ? `BOARD::${boardName} ` : boardInput ? `BOARD::${boardInput} ` : ""}${isReply ? `REPLY::${post.id} ` : ""}${replyBody}`)}`
@@ -86,7 +102,7 @@ export default function CreatePost({ ...props }) {
           <>
             <Textarea
               className="min-h-32 dark:bg-background text-black dark:text-white dark:border-2 dark:border-white"
-              placeholder="Write your post here…"
+              placeholder={placeholder}
               value={memo}
               onChange={e => setMemo(e.target.value)}
             />
@@ -100,7 +116,11 @@ export default function CreatePost({ ...props }) {
                 </div>
               </div>
               <Icons.miniQrCode className="ml-3 text-white dark:text-black" />
-              <Icons.miniCopy className="ml-2 text-primary" style={{ filter: 'drop-shadow(1px 1px 0px rgba(0, 0, 0, .7))' }} />
+              <Icons.miniCopy
+                className="ml-2 text-primary"
+                style={{ filter: 'drop-shadow(1px 1px 0px rgba(0, 0, 0, .7))' }}
+                onClick={() => copyTextToClipboard(zcashAddr)}
+              />
             </div>
             <div className="flex w-full row justify-between">
               <div className="flex flex-1" />
@@ -114,9 +134,9 @@ export default function CreatePost({ ...props }) {
           <>
             {[{ bg: 'white', linearGradient: ['#00F5A0', '#00D9F5'], stroke: 'transparent', borderColor: 'black', borderWidth: '4px' }].map(({ bg, linearGradient, stroke, borderColor, borderWidth }) => (
               // <VStack className="mx-2 mb-4 items-center" alignment="center" style={{ background: bg, padding: 20, borderRadius: '4px' }}>
-              <VStack alignment="center" className="mb-4 bg-gray-950 border-2 border-[#00FF7F] w-full max-w-md pt-8 pb-10 relative">
+              <VStack alignment="center" className="mb-4 bg-gray-950 border-2 border-black dark:border-white w-full pt-8 pb-10 relative">
                 <div className="absolute top-4 right-4">
-                  <Icons.close color="white" onClick={() => setStep(0)} />
+                  <Icons.close color="white" onClick={() => onClose ? onClose() : setStep(0)} />
                 </div>
                 <Text className="mb-4 text-xl text-white leading-[24px] md:text-2xl lg:md:text-3xl" font="mono">
                   Send
@@ -148,11 +168,15 @@ export default function CreatePost({ ...props }) {
             <div className="flex row bg-gradient-dark dark:bg-gradient w-full p-3 py-2">
               <div className="w-full">
                 <div className="text-white dark:text-black">
-                  <EllipsisBoxWrapper text={zaddr} offset={12} />
+                  <EllipsisBoxWrapper className="font-mono" text={zaddr} offset={6} />
                 </div>
               </div>
               <Icons.miniQrCode className="ml-3 text-white dark:text-black" />
-              <Icons.miniCopy className="ml-2 text-primary" style={{ filter: 'drop-shadow(1px 1px 0px rgba(0, 0, 0, .7))' }} />
+              <Icons.miniCopy
+                className="ml-2 text-primary"
+                style={{ filter: 'drop-shadow(1px 1px 0px rgba(0, 0, 0, .7))' }}
+                onClick={() => copyTextToClipboard(zcashAddr)}
+              />
             </div>
             <div className="flex w-full row justify-between">
               {/* <div className="flex flex-1" /> */}

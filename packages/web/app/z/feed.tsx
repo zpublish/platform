@@ -95,13 +95,15 @@ export default function Feed(props: FeedProps) {
         for (const result of results) {
           if (result?.id && (result?.reply_count || 0) > 0 && !zecPagesState[result?.id]) { // @ts-ignore
             const replies = results.filter(({ reply_to_post }) => reply_to_post === result.id);
-            if (result.reply_count && (replies.length < result.reply_count)) {
-              const allReplies = await getReplies({ id: result.id });
-              if (allReplies.length === 0) {
+            if (result.reply_count && result.txid && (replies.length < result.reply_count)) {
+              const allReplies = await getReplies({ txid: result.txid });
+              if (allReplies?.length === 0) {
                 addReply({ reply_to_post: result.id, id: "" } as any);
               } else {
-                for (const reply of allReplies) {
-                  addReply(reply);
+                if (allReplies) {
+                  for (const reply of allReplies) {
+                    addReply(reply);
+                  }
                 }
               }
             } else {
@@ -175,8 +177,6 @@ export default function Feed(props: FeedProps) {
               boardName={!props.boardname ? board_name : undefined}
               txid={txid}
               // mb={16}
-              onPressLike={() => {}}
-              onPressReply={() => {}}
               // onPressLike={() => {
               //   setModalState({
               //     ...modalState,
@@ -221,8 +221,6 @@ export default function Feed(props: FeedProps) {
                         replyCount={i === 0 ? _replyCount : 0}
                         likeCount={likes}
                         id={replyPost.id}
-                        onPressLike={() => {}}
-                        onPressReply={() => {}}
                       />
                     </div>
                   )

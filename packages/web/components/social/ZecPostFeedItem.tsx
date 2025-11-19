@@ -1,5 +1,5 @@
 'use client'
-import React, { lazy } from 'react';
+import React, { lazy, useState } from 'react';
 // import { Icon } from '@elemental-zcash/components';
 // import { ShieldIcon } from '@elemental-zcash/icons';
 
@@ -14,6 +14,7 @@ import { Icons } from '../icons';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Skeleton } from '../ui/skeleton';
+import CreatePost from '../create-post';
 
 // const { LinkIcon } = lazy(() => import('../icons.js'));
 // const LinkIcon = lazy(() => import('./icons.js').then((module) => ({ default: module.LinkIcon })));;
@@ -23,7 +24,7 @@ import { Skeleton } from '../ui/skeleton';
 
 
 const ZecPostFeedItem = ({
-  isLoading, id, username, boardName, name, createdAt, isReply, replyToPostId, replyCount, text, likeCount, amount, onPressLike, onPressReply, txid, ...props
+  isLoading, id, username, boardName, name, createdAt, isReply, replyToPostId, replyCount, text, likeCount, amount, txid, isArchive, ...props
 }: {
   isLoading?: boolean,
   id?: string | number,
@@ -34,14 +35,18 @@ const ZecPostFeedItem = ({
   replyCount?: number,
   createdAt?: Date,
   amount?: number,
-  txid?: string,
+  txid?: string | null,
+  isArchive?: boolean,
   // inReplyToStatusId?: string,
-  replyToPostId?: number,
+  replyToPostId?: number | null,
   isReply?: boolean,
   text?: string,
-  onPressLike?: () => void,
-  onPressReply?: () => void,
+  // onPressLike?: () => void,
+  // onPressReply?: () => void,
 }) => {
+  const [isReplying, setIsReplying] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+
   const isRepliedTo = isReply || !!replyToPostId;
   const isHighlightedPost = (amount || 0) >= 10000000;
   let textContent = text;
@@ -51,7 +56,19 @@ const ZecPostFeedItem = ({
   if (text?.match(/^BOARD::\w+/)) {
     textContent = text.replace(/^board::(\w+)/i, "").trim()
   }
-  // console.log({ isRepliedTo });
+
+  const onPressLike = () => {
+    if (isReplying) {
+      setIsReplying(false);
+    }
+    setIsLiking(!isLiking);
+  };
+  const onPressReply = () => {
+    if (isLiking) {
+      setIsLiking(false);
+    }
+    setIsReplying(!isReplying);
+  }
 
   return (
     <>
@@ -73,7 +90,7 @@ const ZecPostFeedItem = ({
         <VStack className="py-4 px-4 w-full">
           <HStack alignment="none" justify="between" flex={1} className="w-full">
             <VStack>
-              {!!boardName && <p className="w-full text-black dark:text-white text-sm mb-3">Posted to <Link className="font-bold" href={`/a/${boardName}`}>z/{boardName}</Link></p>}
+              {!!boardName && <p className="w-full text-black dark:text-white text-sm mb-3">Posted to <Link className="font-bold" href={isArchive ? `/a/${boardName}` : `/z/${boardName}`}>z/{boardName}</Link></p>}
               <HStack className="gap-3">
                 {isLoading ? (
                   <Skeleton className="bg-[#323e5a] h-10 w-10 rounded-full" />
@@ -94,7 +111,7 @@ const ZecPostFeedItem = ({
               </HStack>
             </VStack>
             <HStack flex={1} />
-            <Link href={`/a/post/${txid}`}>
+            <Link href={isArchive ? `/a/post/${txid}` : `/z/post/${txid}`}>
               <HStack alignment="top">
                 {isLoading ? (
                   <Skeleton className="bg-[#323e5a] rounded-none h-4 w-[80px]" />
@@ -142,9 +159,9 @@ const ZecPostFeedItem = ({
               {isLoading ? (
                 <Skeleton className="bg-[#323e5a] rounded-none h-6 w-[150px]" />
               ): [
-                { component: <Icons.messageCircle size={20} className="text-black" />, id: 'reply' },
+                { component: <Icons.messageCircle size={20} className="text-black dark:text-white" />, id: 'reply' },
                 // { component: FavoriteIcon, id: 'favorite' },
-                { component: <Icons.share size={20} className="text-black text-xs" />, id: 'share' },
+                { component: <Icons.share size={20} className="text-black dark:text-white text-xs" />, id: 'share' },
                 // { component: LinkIcon, id: 'link' },
               ].map(({ component: Comp, id: actionId }) => {
                 const hrefById: any = {
@@ -193,6 +210,16 @@ const ZecPostFeedItem = ({
           </HStack>
         </VStack>
       </VStack>
+      {(isLiking && txid) && (
+        <div className="flex flex-col mt-5 gap-4">
+          <CreatePost isLiking post={{ txid }} onClose={() => setIsLiking(false)} />
+        </div>
+      )}
+      {(isReplying && txid) && (
+        <div className="flex flex-col mt-5 gap-4">
+          <CreatePost isReply post={{ txid }} onClose={() => setIsReplying(false)} />
+        </div>
+      )}
     </>
   );
 };

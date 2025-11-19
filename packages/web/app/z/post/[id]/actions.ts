@@ -1,25 +1,15 @@
 'use server'
-// import { FETCH_POSTS_LIMIT } from "./constants";
-import { Low } from 'lowdb';
-import { getDb, Data } from '@/data/json';
 
-async function findPost(db: Low<Data>, _txid: string) {
+import { Database, getDb } from "@/data";
+import { findPostByTxid, getAllPostsByReplyId } from "@/data/board_posts/posts.repository";
+import { Kysely } from "kysely";
+
+// import { FETCH_POSTS_LIMIT } from "./constants";
+
+async function findPost(db: Kysely<Database>, _txid: string) {
   // Ensure the page number is valid
 
-  // Get the posts from the db
-  const post = db.data.posts.find(({ // @ts-ignore
-    id_tx,// @ts-ignore
-    account,// @ts-ignore
-    txid,// @ts-ignore
-    id,// @ts-ignore
-    height,// @ts-ignore
-    timestamp,// @ts-ignore
-    value,// @ts-ignore
-    address,// @ts-ignore
-    receiver,// @ts-ignore
-    memo,// @ts-ignore
-    expiration,// @ts-ignore
-  }) => ((txid === _txid) || (id === Number(_txid))))
+  const post = await findPostByTxid(db, _txid);
 
   if (!post) {
     return null;
@@ -27,32 +17,30 @@ async function findPost(db: Low<Data>, _txid: string) {
 
   // console.log({ post })
 
-  const { // @ts-ignore
-    id_tx,// @ts-ignore
-    id,// @ts-ignore
-    account,// @ts-ignore
-    txid,// @ts-ignore
-    height,// @ts-ignore
-    timestamp,// @ts-ignore
-    value,// @ts-ignore
-    address,// @ts-ignore
-    receiver,// @ts-ignore
-    memo,// @ts-ignore
-    expiration,// @ts-ignore
-    reply_zaddr,// @ts-ignore
-    likes,// @ts-ignore
-    reply_to_post,// @ts-ignore
-    reply_count,// @ts-ignore
-    ispoll,// @ts-ignore
-    board_name,// @ts-ignore
-    board_zaddr,// @ts-ignore
+  const {
+    id,
+    txid,
+    // height,
+    datetime,
+    amount,
+    // address,
+    // receiver,
+    memo,
+    // expiration,
+    reply_zaddr,
+    likes,
+    reply_to_post,
+    reply_count,
+    ispoll,
+    board_name,
+    board_zaddr,
   } = post;
 
   return {
     "id": Number(id),
     "memo": memo,
-    "datetime": String(timestamp * 1000),
-    "amount": value,
+    "datetime": String(Number(datetime) * 1000),
+    "amount": amount,
     "txid": txid,
     "likes": likes,
     "reply_zaddr": reply_zaddr,
@@ -65,52 +53,34 @@ async function findPost(db: Low<Data>, _txid: string) {
   };
 }
 
-async function findReplies(db: Low<Data>, _id: number) {
+async function findReplies(db: Kysely<Database>, _id: string) {
   // Ensure the page number is valid
 
   // Get the posts from the db
-  const posts = db.data.posts.filter(({ // @ts-ignore
-    id_tx,// @ts-ignore
-    account,// @ts-ignore
-    txid,// @ts-ignore
-    id,// @ts-ignore
-    height,// @ts-ignore
-    timestamp,// @ts-ignore
-    value,// @ts-ignore
-    address,// @ts-ignore
-    receiver,// @ts-ignore
-    memo,// @ts-ignore
-    reply_to_post,// @ts-ignore
-  }) => reply_to_post === _id)
+  const posts = await getAllPostsByReplyId(db, 0, 20, _id);
 
   // console.log({ post })
-    return posts.map((post: any) => {
-      const { // @ts-ignore
-      id_tx,// @ts-ignore
-      id,// @ts-ignore
-      account,// @ts-ignore
-      txid,// @ts-ignore
-      height,// @ts-ignore
-      timestamp,// @ts-ignore
-      value,// @ts-ignore
-      address,// @ts-ignore
-      receiver,// @ts-ignore
-      memo,// @ts-ignore
-      expiration,// @ts-ignore
-      reply_zaddr,// @ts-ignore
-      likes,// @ts-ignore
-      reply_to_post,// @ts-ignore
-      reply_count,// @ts-ignore
-      ispoll,// @ts-ignore
-      board_name,// @ts-ignore
-      board_zaddr,// @ts-ignore
-    } = post;
+    return posts?.map((post: any) => {
+      const { 
+        id,
+        txid,
+        datetime,
+        amount,
+        memo,
+        reply_zaddr,
+        likes,
+        reply_to_post,
+        reply_count,
+        ispoll,
+        board_name,
+        board_zaddr,
+      } = post;
 
     return {
       "id": Number(id),
       "memo": memo,
-      "datetime": String(timestamp * 1000),
-      "amount": value,
+      "datetime": String(Number(datetime) * 1000),
+      "amount": amount,
       "txid": txid,
       "likes": likes,
       "reply_zaddr": reply_zaddr,
@@ -131,7 +101,6 @@ export default async function getPost({
 }) {
 
   const db = await getDb();
-  await db.read();
 
   const posts = await findPost(db, txid)
 
@@ -139,15 +108,15 @@ export default async function getPost({
 }
 
 export async function getReplies({
-  id
+  txid
 }: {
-  id: number;
+  txid: string;
 }) {
 
   const db = await getDb();
-  await db.read();
+  // await db.read();
 
-  const posts = await findReplies(db, id)
+  const posts = await findReplies(db, txid)
 
   return posts;
 }

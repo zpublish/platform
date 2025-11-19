@@ -94,9 +94,8 @@ export default async function IndexPage({ params, searchParams }: { params: { id
             id={post.id}
             txid={post.txid}
             amount={post.amount}
+            isArchive
             // mb={16}
-            onPressLike={null as any}
-            onPressReply={null as any}
           />
           {!!replies && (
                 <div className="ml-10">
@@ -112,8 +111,7 @@ export default async function IndexPage({ params, searchParams }: { params: { id
                       txid={_post.id}
                       amount={_post.amount}
                       // mb={16}
-                      onPressLike={null as any}
-                      onPressReply={null as any}
+                      isArchive
                   />
                   )))}
                 </div>

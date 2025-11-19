@@ -20,12 +20,13 @@ import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import HomePosts from "./posts";
+import { fetchBoardNames } from "../z/actions";
 
 
 
 export default async function IndexPage() {
+  const boardNames = await fetchBoardNames();
   
-
   return (
     <>
       <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
@@ -47,7 +48,7 @@ export default async function IndexPage() {
           <div className="p-4 bg-primary w-20">Test</div>
         </VStack> */}
       </section>
-      <HomePosts />
+      <HomePosts boardNames={boardNames} />
     </>
   )
 }

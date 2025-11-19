@@ -49,9 +49,31 @@ export async function getAllPosts(
   const posts = await db
     .selectFrom('board_posts')
     .selectAll()
-    .orderBy('id', 'desc')       // equivalent to reverse()
-    .offset(startIndex)           // skip first `startIndex` rows
-    .limit(endIndex - startIndex) // take `endIndex - startIndex` rows
+    .orderBy('id', 'desc')
+    .offset(startIndex)
+    .limit(endIndex - startIndex)
+    .execute();
+
+  return posts;
+}
+
+export async function getAllPostsByReplyId(
+  db: Kysely<Database>,
+  startIndex: number = 0,
+  endIndex: number = 20,
+  txid: string
+): Promise<BoardPostsRow[] | undefined> {
+  const post = await findPostByTxid(db, txid);
+  if (!post) {
+    return undefined;
+  }
+  const posts = await db
+    .selectFrom('board_posts')
+    .selectAll()
+    .where('reply_to_post', '=', post.id)
+    .orderBy('id', 'desc')
+    .offset(startIndex)
+    .limit(endIndex - startIndex)
     .execute();
 
   return posts;

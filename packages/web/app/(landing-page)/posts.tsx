@@ -6,19 +6,9 @@ import { HStack } from "@/components/ui/hstack";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import Feed from "../z/feed";
 
-export default function HomePosts() {
+export default function HomePosts({ boardNames }: { boardNames?: string[] }) {
   const router = useRouter();
-  const [board_names, setBoardNames] = useState<string[]>([]);
 
-  useEffect(() => {
-    async function getBoardNames() {
-      const names = await fetchBoardNames();
-      if (names) {
-        setBoardNames(names);
-      }
-    }
-    getBoardNames();
-  }, [])
 
   return (
     <section id="post-feed" className="space-y-6 pb-8 pt-4">
@@ -27,8 +17,8 @@ export default function HomePosts() {
           {/* <Input placeholder="Search" className="w-auto" /> */}
           <NativeSelect className="text-black dark:text-white" onChange={e => router.push(`/z/${e.target.value}`)}>
             <NativeSelectOption value="">z/all</NativeSelectOption>
-            {board_names.map((board_name) => (
-              <NativeSelectOption key={board_name} value={board_name}>{`z/${board_name}`}</NativeSelectOption>
+            {boardNames?.map((boardName) => (
+              <NativeSelectOption key={boardName} value={boardName}>{`z/${boardName}`}</NativeSelectOption>
             ))}
           </NativeSelect>
           {/* <HStack alignment="center" className="gap-3 justify-self-end">

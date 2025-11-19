@@ -173,9 +173,10 @@ export default function Feed(props: FeedProps) {
               amount={amount}
               boardName={!props.boardname ? board_name : undefined}
               txid={txid}
+              isArchive
               // mb={16}
-              onPressLike={() => {}}
-              onPressReply={() => {}}
+              // onPressLike={() => {}}
+              // onPressReply={() => {}}
               // onPressLike={() => {
               //   setModalState({
               //     ...modalState,
@@ -220,8 +221,6 @@ export default function Feed(props: FeedProps) {
                         replyCount={i === 0 ? _replyCount : 0}
                         likeCount={likes}
                         id={replyPost.id}
-                        onPressLike={() => {}}
-                        onPressReply={() => {}}
                       />
                     </div>
                   )

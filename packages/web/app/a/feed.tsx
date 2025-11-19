@@ -40,7 +40,7 @@ type BoardQuery = {
 
 const useBoards = (query?: BoardQuery) =>
   useInfiniteQuery({
-    queryKey: ["board", query],
+    queryKey: ["archive", query],
     queryFn: async ({ pageParam = 1 }: { pageParam: number }) => {
       const isDev = false;
       // const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;

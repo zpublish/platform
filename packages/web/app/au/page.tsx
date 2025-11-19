@@ -59,7 +59,7 @@ type UserQuery = {}
 
 const useDirectory = (query?: UserQuery) =>
   useInfiniteQuery({
-    queryKey: ["users"/*, query*/],
+    queryKey: ["archivedusers"/*, query*/],
     queryFn: async ({ pageParam = 1 }: { pageParam: number }) => {
       const isDev = false;
       // const url = isDev ? `http://test.local:9000/board/${pageParam}.json` : `https://be.zecpages.com/board/${pageParam}`;

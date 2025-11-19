@@ -17,14 +17,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('board_name', 'varchar(255)')
     .addColumn('board_zaddr', 'varchar(255)')
     .execute();
-  
-  await db.schema
-    .createTable('votes')
-    .ifNotExists()
-    .addColumn('id', 'integer', col => col.primaryKey().notNull().defaultTo(0))
-    .addColumn('poll_id', 'integer')
-    .addColumn('poll_txid', 'varchar(255)')
-    .addColumn('option', 'integer')
 
   // await db.schema
   //   .createTable('person')

@@ -134,17 +134,47 @@ export async function getBoardNames(
 //   return user
 // }
 
+export async function getLikeCount(
+  db: Kysely<Database>,
+  txid: string,
+): Promise<number> {
+  const count = await db
+    .selectFrom('likes')
+    .select(db.fn.count('id').as('count'))
+    .where('post_txid', '=', txid)
+    .executeTakeFirst();
+  
+  return Number(count?.count ?? 0);
+}
+
 export async function setPostLikes(
   db: Kysely<Database>,
   txid: string,
+  likedTxid: string,
   amount: number,
   likes: number,
 ): Promise<void> {
-  await db
-    .updateTable('board_posts')
-    .where('txid', '=', txid)
-    .set({ amount, likes })
-    .execute()
+  const post = await findPostByTxid(db, likedTxid);
+  if (!post) {
+    return;
+  }
+  const insertedLike = await db
+    .insertInto('likes')
+    .values({
+      post_id: post.id,
+      txid,
+      post_txid: likedTxid,
+    })
+    .returningAll()
+    .executeTakeFirstOrThrow()
+  
+  if (insertedLike) {
+    await db
+      .updateTable('board_posts')
+      .where('txid', '=', likedTxid)
+      .set({ amount, likes })
+      .execute()
+  }
 }
 
 export async function setPostReplyCount(

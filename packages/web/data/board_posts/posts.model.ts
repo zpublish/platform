@@ -2,7 +2,7 @@
 
 import { getDb } from ".."
 import { insertVote } from "../votes/votes.repository"
-import { findPostByTxid, insertPost, setPostLikes, setPostReplyCount } from "./posts.repository"
+import { findPostByTxid, getLikeCount, insertPost, setPostLikes, setPostReplyCount } from "./posts.repository"
 import { InsertableBoardPosts } from "./posts.table"
 
 // const Users = require("../users/users-model")
@@ -123,7 +123,8 @@ export async function add(data: {
           const likedPost = await findPostByTxid(db, postTxid)
           console.log({ likedPost })
           if (likedPost) {
-            await setPostLikes(db, postTxid, likedPost?.amount + data.amount, (likedPost.likes || 0) + 1)
+            const oldLikes = await getLikeCount(db, postTxid);
+            await setPostLikes(db, data.txid, postTxid, likedPost?.amount + data.amount, (oldLikes) + 1)
             // await db('board_posts').where({id: postId}).update({amount: likedPost.amount + post.amount, likes: likedPost.likes + 1})
             return [{new_amount: likedPost.amount + data.amount, liked_post_txid: Number(postTxid)}]
           }

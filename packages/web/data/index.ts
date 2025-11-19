@@ -3,11 +3,13 @@ import SQLite from 'better-sqlite3';
 
 import { BoardPostsTable } from "./board_posts/posts.table";
 import { VotesTable } from "./votes/votes.table";
+import { LikesTable } from "./likes/likes.table";
 
 
 export interface Database {
   board_posts: BoardPostsTable;
   votes: VotesTable;
+  likes: LikesTable;
 }
 
 

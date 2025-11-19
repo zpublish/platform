@@ -34,7 +34,7 @@ export default async function IndexPage() {
             ZEC-powered Anonymous Memo Board
           </Text>
           <Text as="h2" className="font-mono font-bold text-black text-lg mb-2 dark:text-[#a0f]">
-            (experimental – all posts will be reset)
+            (experimental/alpha)
           </Text>
           <CreatePost />
         </div>

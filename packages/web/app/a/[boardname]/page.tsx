@@ -96,7 +96,7 @@ export default function IndexPage({ params, searchParams }: { params: { boardnam
         <div className="container max-w-[64rem]">
           <HStack className="w-full gap-2">
             {/* <Input placeholder="Search" className="w-auto" /> */}
-            <NativeSelect value={params.boardname} onChange={e => router.push(`/a/${e.target.value}`)}>
+            <NativeSelect className="text-black dark:text-white" value={params.boardname} onChange={e => router.push(`/a/${e.target.value}`)}>
               <NativeSelectOption value="">z/all</NativeSelectOption>
               {board_names.map((board_name) => (
                 <NativeSelectOption value={board_name}>{`z/${board_name}`}</NativeSelectOption>

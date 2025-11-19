@@ -6,8 +6,8 @@ import { findPostByTxid, insertPost, setPostLikes, setPostReplyCount } from "./p
 import { InsertableBoardPosts } from "./posts.table"
 
 // const Users = require("../users/users-model")
-const likeRegex = /LIKE::(\d+)/i
-const replyRegex = /REPLY::(\d+)/i
+const likeRegex = /LIKE::(\w+)/i
+const replyRegex = /REPLY::(\w+)/i
 const subscribeRegex = /SUBSCRIBE::(\d+)::(\d+)/i
 const filterRegex = /FILTER::(\w_+)::(\w_+)/i
 const boardRegex = /BOARD::( *)(\w+)/i
@@ -114,11 +114,14 @@ export async function add(data: {
     // }
 
     if (data.memo.replace(/ /g, "").match(likeRegex)) {
+      console.log(123)
         newPost.memo = data.memo.replace(/ /g, "");
         const like = data.memo.match(likeRegex)?.[0]
         const postTxid = like?.split("::")[1].split(" ")[0]
+        console.log({ like, postTxid })
         if (postTxid) {
           const likedPost = await findPostByTxid(db, postTxid)
+          console.log({ likedPost })
           if (likedPost) {
             await setPostLikes(db, postTxid, likedPost?.amount + data.amount, (likedPost.likes || 0) + 1)
             // await db('board_posts').where({id: postId}).update({amount: likedPost.amount + post.amount, likes: likedPost.likes + 1})

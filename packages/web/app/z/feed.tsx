@@ -32,6 +32,7 @@ type Board = BoardFeedItem & {
   name: string;
   reply_to_post: string | undefined;
   board_name?: string;
+  reply_zaddr?: string;
 }
 
 type BoardQuery = {
@@ -150,7 +151,7 @@ export default function Feed(props: FeedProps) {
         await loadMoreRows(res);
       }}
       renderItem={({ item, index }: { item: Board, index: number }) => {
-        const { datetime, memo, txid, reply_to_post, board_name, reply_count: replyCount, id, likes, amount } = item || {};
+        const { datetime, memo, txid, reply_to_post, board_name, reply_count: replyCount, id, likes, amount, reply_zaddr } = item || {};
         const isLoaded = isRowLoaded({ index });
         console.log({ isLoaded, datetime, reply_to_post })
 
@@ -176,6 +177,7 @@ export default function Feed(props: FeedProps) {
               amount={amount}
               boardName={!props.boardname ? board_name : undefined}
               txid={txid}
+              replyZaddr={reply_zaddr}
               // mb={16}
               // onPressLike={() => {
               //   setModalState({
@@ -221,6 +223,8 @@ export default function Feed(props: FeedProps) {
                         replyCount={i === 0 ? _replyCount : 0}
                         likeCount={likes}
                         id={replyPost.id}
+                        txid={replyPost.txid}
+                        replyZaddr={replyPost.reply_zaddr}
                       />
                     </div>
                   )

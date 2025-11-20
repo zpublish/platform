@@ -24,7 +24,8 @@ import CreatePost from '../create-post';
 
 
 const ZecPostFeedItem = ({
-  isLoading, id, username, boardName, name, createdAt, isReply, replyToPostId, replyCount, text, likeCount, amount, txid, isArchive, ...props
+  isLoading, id, username, boardName, name, createdAt, isReply, replyToPostId, replyCount, text, likeCount, amount, txid, isArchive, replyZaddr,
+  ...props
 }: {
   isLoading?: boolean,
   id?: string | number,
@@ -41,6 +42,7 @@ const ZecPostFeedItem = ({
   replyToPostId?: number | null,
   isReply?: boolean,
   text?: string,
+  replyZaddr?: string,
   // onPressLike?: () => void,
   // onPressReply?: () => void,
 }) => {
@@ -218,12 +220,12 @@ const ZecPostFeedItem = ({
       </VStack>
       {(isLiking && txid) && (
         <div className="flex flex-col mt-5 gap-4">
-          <CreatePost isLiking post={{ txid }} onClose={() => setIsLiking(false)} />
+          <CreatePost isLiking post={{ txid, reply_zaddr: replyZaddr }} onClose={() => setIsLiking(false)} />
         </div>
       )}
       {(isReplying && txid) && (
         <div className="flex flex-col mt-5 gap-4">
-          <CreatePost isReply post={{ txid }} onClose={() => setIsReplying(false)} />
+          <CreatePost isReply post={{ txid, reply_zaddr: replyZaddr }} onClose={() => setIsReplying(false)} />
         </div>
       )}
     </>

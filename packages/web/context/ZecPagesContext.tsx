@@ -10,6 +10,8 @@ export type ReplyValue = {
   reply_to_post?: string,
   datetime?: string,
   reply_count?: number,
+  txid?: string,
+  reply_zaddr?: string,
 }
 
 type Action = {

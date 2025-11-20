@@ -50,7 +50,7 @@ function encodeMemoForUri(str: string): string {
 export default function CreatePost({ isReply, isLiking, post, onClose, ...props }: {
   isReply?: boolean,
   isLiking?: boolean,
-  post?: { txid: string },
+  post?: { txid: string, reply_zaddr?: string },
   onClose?: () => void,
 }) {
   const [memo, setMemo] = useState('');
@@ -62,7 +62,7 @@ export default function CreatePost({ isReply, isLiking, post, onClose, ...props 
     ref: elementRef,
     box: 'border-box',
   });
-  const amount = '0.001';
+  const amount = 0.001;
   const placeholder = isLiking ? "" : (isReply ? "Write your reply here…" : "Write your post here…")
   const isPoll = false;
   const pollBuilder = {};
@@ -76,7 +76,8 @@ export default function CreatePost({ isReply, isLiking, post, onClose, ...props 
   );
 
   // const encodedMemo = toBase64(memo).replace('=', '');
-  const zcashAddr = `zcash:${zaddr}?amount=${amount}&memo=${encodedMemo}`;
+  const zcashAddr = post?.reply_zaddr ? `zcash:?address=${zaddr}&amount=${amount}&memo=${encodedMemo}&address.1=${post.reply_zaddr}&amount.1=${amount}&memo.1=${encodedMemo}`
+   : `zcash:${zaddr}?amount=${amount}&memo=${encodedMemo}`;
 
   // const encodedMemo = 
   //   isPoll ? toBase64("POLL::" + JSON.stringify(pollBuilder))
@@ -84,7 +85,7 @@ export default function CreatePost({ isReply, isLiking, post, onClose, ...props 
 
   useEffect(() => {
     if (byteSize(encodedMemo) >= 512) {
-      setError('Zcash memos are capped to 512 bytes, please shorten your post.');
+      setError(`Zcash memos are capped to 512 bytes, please shorten your post by ${byteSize(encodedMemo) - 512} bytes.`);
     // } else if (memo?.length > 280) {
     //   setError('Tweets are limited to 280 characters, please shorten your post.');
     } else {

@@ -20,12 +20,14 @@ import { ReplyValue, useZecPages } from '@/context/ZecPagesContext';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import HomePosts from "./posts";
-import { fetchBoardNames } from "../z/actions";
+import { fetchBoardNames, getDecayedPinnedPost } from "../z/actions";
 
 
 
 export default async function IndexPage() {
   const boardNames = await fetchBoardNames();
+  const pinnedPost = await getDecayedPinnedPost();
+  console.log({ pinnedPost })
   
   return (
     <>
@@ -48,7 +50,7 @@ export default async function IndexPage() {
           <div className="p-4 bg-primary w-20">Test</div>
         </VStack> */}
       </section>
-      <HomePosts boardNames={boardNames} />
+      <HomePosts boardNames={boardNames} pinnedPost={pinnedPost} />
     </>
   )
 }

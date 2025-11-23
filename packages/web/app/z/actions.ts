@@ -2,7 +2,7 @@
 // import { FETCH_POSTS_LIMIT } from "./constants";
 import { Low } from 'lowdb';
 // import { getDb, Data } from '@/data/json';
-import { getAllPosts, getBoardNames, getPostsCount } from '@/data/board_posts/posts.repository';
+import { getAllPosts, getBoardNames, getDecayedPinned, getPostsCount } from '@/data/board_posts/posts.repository';
 import { Database, getDb } from '@/data';
 import { Kysely } from 'kysely';
 
@@ -21,24 +21,19 @@ async function getPaginatedPosts(db: Kysely<Database>, page = 1, limit = 10, boa
   console.log({ boardNames: await getBoardNames(db) })
   
   // Get the posts from the db
-  const posts = (await getAllPosts(db, startIndex, endIndex))?.map(({ // @ts-ignore
-    id,// @ts-ignore
-    account,// @ts-ignore
-    txid,// @ts-ignore
-    height,// @ts-ignore
-    datetime,// @ts-ignore
-    amount,// @ts-ignore
-    address,// @ts-ignore
-    receiver,// @ts-ignore
-    memo,// @ts-ignore
-    expiration,// @ts-ignore
-    reply_zaddr,// @ts-ignore
-    likes,// @ts-ignore
-    reply_to_post,// @ts-ignore
-    reply_count,// @ts-ignore
-    ispoll,// @ts-ignore
-    board_name,// @ts-ignore
-    board_zaddr,// @ts-ignore
+  const posts = (await getAllPosts(db, startIndex, endIndex))?.map(({
+    id,
+    txid,
+    datetime,
+    amount,
+    memo,
+    reply_zaddr,
+    likes,
+    reply_to_post,
+    reply_count,
+    ispoll,
+    board_name,
+    board_zaddr,
   }) => ({
     "id": Number(id),
     "memo": memo,
@@ -55,8 +50,6 @@ async function getPaginatedPosts(db: Kysely<Database>, page = 1, limit = 10, boa
     "username": null,
   })).filter((n: any) => (n.id && (boardName ? n.board_name === boardName : true)));
 
-  console.log({ posts })
-
   // Check if there are more posts
   const hasMore = totalPosts > endIndex;
 
@@ -70,6 +63,13 @@ async function getPaginatedPosts(db: Kysely<Database>, page = 1, limit = 10, boa
   };
 }
 
+export async function getDecayedPinnedPost() {
+  const db = await getDb();
+  const post = await getDecayedPinned(db)
+
+  return post;
+}
+
 export default async function getPosts({
   pageParam = 1,
   limit = 20,
@@ -79,13 +79,10 @@ export default async function getPosts({
   limit: number;
   boardName?: string;
 }) {
-
   const db = await getDb();
   // await db.read();
 
   const posts = await getPaginatedPosts(db, pageParam, limit, boardName);
-
-  console.log({ posts })
 
   return posts;
 }

@@ -5,14 +5,19 @@ import { fetchBoardNames } from "../z/actions";
 import { HStack } from "@/components/ui/hstack";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import Feed from "../z/feed";
+import ZecPostFeedItem from "@/components/social/ZecPostFeedItem";
 
-export default function HomePosts({ boardNames }: { boardNames?: string[] }) {
+export default function HomePosts({ boardNames, pinnedPost }: { boardNames?: string[], pinnedPost?: { amount: number, memo: string } }) {
   const router = useRouter();
-
 
   return (
     <section id="post-feed" className="space-y-6 pb-8 pt-4">
       <div className="container max-w-[64rem]">
+        {pinnedPost && pinnedPost.amount >= 1000000 && (
+          <div className="mb-8">
+            <ZecPostFeedItem amount={pinnedPost.amount} text={pinnedPost.memo} />
+          </div>
+        )}
         <HStack className="w-full gap-2">
           {/* <Input placeholder="Search" className="w-auto" /> */}
           <NativeSelect className="text-black dark:text-white" onChange={e => router.push(`/z/${e.target.value}`)}>

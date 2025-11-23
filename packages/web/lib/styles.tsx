@@ -21,7 +21,7 @@ export function extend<T extends React.ElementType>(
       const Comp = asChild ? Slot : element;
       return (
         <Comp
-          className={cn(className, baseClass)}
+          className={cn(baseClass, className)}
           ref={ref}
           {...configProps}
           {...props}

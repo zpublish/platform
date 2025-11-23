@@ -84,4 +84,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  @property --angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  @keyframes rotateGradient {
+    to {
+      --angle: 360deg;
+    }
+  }
 }

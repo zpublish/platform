@@ -1,6 +1,7 @@
 import { extend } from '@/lib/styles';
 import { Text } from '../ui/text';
 import { VStack } from '../ui/vstack';
+import { cn } from '@/lib/utils';
 
 // import React from 'react';
 // import { extend, Text, Box } from 'elemental-react';
@@ -35,20 +36,18 @@ export const TextPlaceHolder = () => (
 //     <UsernameText>{`@${username}`}</UsernameText>
 //   </Box>
 // );
-export const AnonProfileNamesRow = ({ username, name }: { username?: string, name?: string }) => (
+export const AnonProfileNamesRow = ({ isHighlighted, username, name }: { isHighlighted?: boolean, username?: string, name?: string }) => (
   <VStack alignment="leading">
-    {/* <NameText color="#737373" fontWeight={500} mb={1}>{name}</NameText> */}
-    <NameText className="text-black dark:text-white font-medium mb-0.5">{name}</NameText>
-    <UsernameText>{`${username}`}</UsernameText>
-    {/* <NameText color="#737373" fontWeight={500} mb={1}>{name}</NameText>
-    <UsernameText fontFamily="primary">{`${username}`}</UsernameText> */}
+    <NameText className={
+      cn("text-black dark:text-white font-medium mb-0.5", isHighlighted && "dark:text-black")}>{name}</NameText>
+    <UsernameText className={isHighlighted && "dark:text-black" || undefined}>{`${username}`}</UsernameText>
   </VStack>
 );
 
-export const PostText = ({ children }: { children?: string }) => (
+export const PostText = ({ isHighlighted, className, children }: { isHighlighted?: boolean, className?: string, children?: string }) => (
   <VStack alignment="leading" className="pt-1">
     {children ? (
-      <Text className="text-base font-sans text-black dark:text-white" style={{ wordBreak: 'break-word' }}>
+      <Text className={cn("text-base font-sans text-black dark:text-white", isHighlighted && "dark:text-black", className)} style={{ wordBreak: 'break-word' }}>
         {children}
       </Text>
     ) : <TextPlaceHolder />}

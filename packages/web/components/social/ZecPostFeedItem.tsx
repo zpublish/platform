@@ -50,7 +50,7 @@ const ZecPostFeedItem = ({
   const [isLiking, setIsLiking] = useState(false);
 
   const isRepliedTo = isReply || !!replyToPostId;
-  const isHighlightedPost = (amount || 0) >= 10000000;
+  const isHighlightedPost = isArchive ? ((amount || 0) >= 10000000) : (amount || 0) >= 1000000;
   let textContent = text;
   if (isRepliedTo) {
     textContent = text?.replace(/^REPLY::\w+ /, '');
@@ -87,7 +87,7 @@ const ZecPostFeedItem = ({
         // #ECF7F9
         className={cn(
           "w-full border border-black bg-card dark:border-[#00FF7F]",
-          isHighlightedPost && 'bg-[#FF879B] dark:bg-[#4c0322]',
+          isHighlightedPost && '[border-image-source:linear-gradient(var(--angle),#ff006c,#ff879b)] [border-image-slice:60_30] bg-[linear-gradient(var(--angle),#00F5A0,#00D9F5)] dark:bg-[linear-gradient(var(--angle),#250037,#001e21)] dark:text-black animate-[rotateGradient_5s_linear_infinite]',
           isLoading && 'mt-2'
         )}
         // className="w-full border-2 border-black bg-[#E9F7F9] dark:bg-background dark:border-white"

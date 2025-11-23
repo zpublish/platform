@@ -134,6 +134,22 @@ export async function getBoardNames(
 //   return user
 // }
 
+export async function getDecayedPinned(
+  db: Kysely<Database>,
+) {
+  const posts = await db
+    .selectFrom('board_posts')
+    .where('amount', '>=', 1000000)
+    .orderBy('amount', 'desc')
+    .selectAll('board_posts')
+    .execute();
+
+  const postsWithAdjustedPrice = posts.map((post) =>
+    ({ ...post, decayed_amount: Math.round(post.amount - (Date.now() - (+post.datetime * 1000)) / 200) })
+  );
+  return postsWithAdjustedPrice.sort((a, b) => b.decayed_amount - a.decayed_amount)[0]
+}
+
 export async function getLikeCount(
   db: Kysely<Database>,
   txid: string,

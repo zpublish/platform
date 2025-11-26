@@ -3,7 +3,7 @@ import { SiteConfig } from "@/types";
 export const siteConfig: SiteConfig = {
   name: "ZECpublish",
   description:
-    "ZEC-powered Anonymous Memo Board",
+    "Censorship resistant and Zcash blockchain-powered social media platform. Post messages to the anonymous message board and interact with other users via microtransactions.",
   url: "https://zpublish.org",
   ogImage: "",
   links: {

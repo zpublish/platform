@@ -73,9 +73,44 @@ export const metadata = {
     // creator: "@",
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      {
+        rel: "icon",
+        type: "image/ico",
+        url: "/favicon.ico",
+        sizes: "16x16",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        url: "/icons/favicon16.png",
+        sizes: "16x16",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        url: "/icons/favicon32.png",
+        sizes: "32x32",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        url: "/icons/favicon96.png",
+        sizes: "96x96",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        url: "/icons/favicon192.png",
+        sizes: "192x192",
+      },
+      {
+        rel: "icon",
+        type: "image/png",
+        url: "/icons/favicon512.png",
+        sizes: "512x512",
+      },
+    ],
   },
   manifest: `${siteConfig.url}/site.webmanifest`,
 }

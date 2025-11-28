@@ -173,7 +173,7 @@ const ZecPostFeedItem = ({
                 // { component: LinkIcon, id: 'link' },
               ].map(({ component: Comp, id: actionId }) => {
                 const hrefById = {
-                  link: isArchive ? `https://zecpublish.com/a/post/${id}/` : `https://zecpublish.com/z/post/${id}/`,
+                  link: isArchive ? `https://zecpublish.com/a/post/${txid || id}/` : `https://zecpublish.com/z/post/${txid}/`,
                   // reply: `https://zecpages.com/z/post/${id}/`,
                   // repost: `https://twitter.com/intent/retweet?tweet_id=${id}`,
                   // favorite: `https://twitter.com/intent/like?tweet_id=${id}`,
